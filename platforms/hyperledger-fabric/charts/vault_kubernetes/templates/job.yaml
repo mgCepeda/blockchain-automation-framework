@@ -42,6 +42,9 @@ spec:
               apk update && apk add jq curl;
               chmod u+x kubectl && mv kubectl /bin/kubectl;
 
+              # create build folder??
+              mkir -m 755 ../../../configuration/build2
+
               validateVaultResponse () {
                 if echo ${2} | grep "errors"; then
                   echo "ERROR: unable to retrieve ${1}: ${2}"
@@ -63,10 +66,7 @@ spec:
                 fi
               }
 
-              # create namespace here or in rol?
-
-              # create service account  here or in rol?
-
+          
               KUBE_SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
               echo "Getting secrets from Vault Server: ${VAULT_ADDR}"
 
@@ -76,9 +76,14 @@ spec:
                 -d '{"role":"'"${VAULT_APP_ROLE}"'","jwt":"'"${KUBE_SA_TOKEN}"'"}' | \
                 jq -r 'if .errors then . else .auth.client_token end')
               validateVaultResponse 'vault login token' "${VAULT_CLIENT_TOKEN}"
+              
+              # Create auth
+
+              curl --header "X-Vault-Token: $VAULT_TOKEN" --request POST --data '{"type": "kubernetes"}' {{ $.Values.vault.address }}/v1/sys/auth/{{ $.Values.vault.auth_path }};
 
               vault_secret_key="${VAULT_SECRET_PREFIX}"
 
+          
               # Generate tessera keys
               tessera -keygen -filename nodeKey < /dev/null
 
