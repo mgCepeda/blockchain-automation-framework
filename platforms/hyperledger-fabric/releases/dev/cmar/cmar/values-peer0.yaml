@@ -1,0 +1,63 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: cmar-peer0
+  namespace: cmar-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: cmar-peer0
+  chart:
+    git: https://github.com/mgCepeda/blockchain-automation-framework.git
+    ref: feature-1572
+    path: platforms/hyperledger-fabric/charts/peernode    
+  values:
+    metadata:
+      namespace: cmar-net
+      images:
+        couchdb: couchdb:3.1
+        peer: hyperledger/fabric-peer:2.2.2
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+        
+    peer:
+      name: peer0
+      gossippeeraddress: peer0.cmar-net:7051
+      gossipexternalendpoint: peer0.cmar-net.hf.demo.aws.blockchaincloudpoc-develop.com:8443
+      localmspid: cmarMSP
+      loglevel: info
+      tlsstatus: true
+      builder: hyperledger/fabric-ccenv:2.2.2
+      couchdb:
+        username: cmar-user
+
+    storage:
+      peer:
+        storageclassname: cmarsc
+        storagesize: 512Mi
+      couchdb:
+        storageclassname: cmarsc
+        storagesize: 1Gi
+
+    vault:
+      role: vault-role
+      address: http://vault.internal.demo.aws.blockchaincloudpoc.com:9001
+      authpath: demo-testcmar-net-auth
+      secretprefix: secret/crypto/peerOrganizations/cmar-net/peers/peer0.cmar-net
+      secretambassador: secret/crypto/peerOrganizations/cmar-net/ambassador
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      secretcouchdbpass: secret/credentials/cmar-net/couchdb/cmar?user
+
+    service:
+      servicetype: ClusterIP
+      ports:
+        grpc:
+          clusteripport: 7051
+        events:
+          clusteripport: 7053
+        couchdb:
+          clusteripport: 5984
+          
+    proxy:
+      provider: "haproxy"
+      external_url_suffix: hf.demo.aws.blockchaincloudpoc-develop.com
