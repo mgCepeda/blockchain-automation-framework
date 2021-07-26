@@ -1,0 +1,40 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: joinchannel-peer0-join-allchannel-cmar-peer0
+  namespace: cmar-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: joinchannel-peer0-join-allchannel-cmar-peer0
+  chart:
+    git: https://github.com/mgCepeda/blockchain-automation-framework.git
+    ref: feature-1572
+    path: platforms/hyperledger-fabric/charts/join_channel
+  values:
+    metadata:
+      namespace: cmar-net
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.2
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+
+    peer:
+      name: peer0
+      address: peer0.cmar-net.hf.demo.aws.blockchaincloudpoc-develop.com:8443
+      localmspid: cmarMSP
+      loglevel: debug
+      tlsstatus: true
+
+    vault:
+      role: vault-role
+      address: http://vault.internal.demo.aws.blockchaincloudpoc.com:9001
+      authpath: demo-testcmar-net-auth
+      adminsecretprefix: secret/crypto/peerOrganizations/cmar-net/users/admin
+      orderersecretprefix: secret/crypto/peerOrganizations/cmar-net/orderer
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+
+    channel:
+      name: allchannel      
+    orderer:
+      address: orderer1.hf.demo.aws.blockchaincloudpoc-develop.com:8443
