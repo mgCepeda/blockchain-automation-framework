@@ -66,7 +66,6 @@ spec:
                 fi
               }
 
-          
               KUBE_SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
               echo "Getting secrets from Vault Server: ${VAULT_ADDR}"
 
@@ -77,9 +76,46 @@ spec:
                 jq -r 'if .errors then . else .auth.client_token end')
               validateVaultResponse 'vault login token' "${VAULT_CLIENT_TOKEN}"
               
-              # Create auth
+              export VAULT_SA_NAME=$(kubectl kubectl get serviceaccount -n {{ $.Values.metadata.namespace }} -o jsonpath="{.secrets[*]['name']}");
+              export SA_JWT_TOKEN=$(kubectl get secret $VAULT_SA_NAME -n {{ $.Values.metadata.namespace }} -o jsonpath="{.data.token}" | base64 -d; echo);
+              export SA_CA_CRT_ONELINE=$(kubectl get secret $VAULT_SA_NAME -n {{ $.Values.metadata.namespace }} -o jsonpath="{.data['ca\.crt']}" | base64 -d | awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}');
 
-              curl --header "X-Vault-Token: $VAULT_TOKEN" --request POST --data '{"type": "kubernetes"}' {{ $.Values.vault.address }}/v1/sys/auth/{{ $.Values.vault.auth_path }};
+              # Create auth 
+              curl \
+                --header "X-Vault-Token: $VAULT_CLIENT_TOKEN" \
+                --request POST \
+                --data '{"type": "kubernetes"}' \
+                ${VAULT_ADDR}/v1/auth/${KUBERNETES_AUTH_PATH};
+
+              curl \
+                --header "X-Vault-Token: $VAULT_TOKEN" \
+                --request POST \
+                --data '{"kubernetes_host": "{{ $.Values.k8s.url }}", "kubernetes_ca_cert": "'"$SA_CA_CRT_ONELINE"'", "token_reviewer_jwt": "'"$SA_JWT_TOKEN"'"}' \
+                -s -k ${VAULT_ADDR}/v1/auth/${KUBERNETES_AUTH_PATH}/config;
+
+              vault auth enable --path="${VAULT_ADDR}" kubernetes
+
+              KUBECONFIG={{ $.Values.k8s.config_file }} kubectl -n {{ $.Values.metadata.name }} get secrets $(KUBECONFIG={{ kubernetes.config_file }} kubectl -n {{ component_name }} get secrets | grep "default" | awk '{print $1}') -o jsonpath="{.data['ca\.crt']}" | base64 -d > "./build/{{ component_name }}.ca.cert"
+
+              export REVIEWER_TOKEN=$(KUBECONFIG={{ kubernetes.config_file }} kubectl get secret $(KUBECONFIG={{ kubernetes.config_file }} kubectl get serviceaccount -n {{ component_name }} vault-reviewer -o jsonpath={.secrets[0].name}) -n {{ component_name }} -o  jsonpath={.data.token} | base64 -d)
+              vault write auth/${VAULT_ADDR}/config token_reviewer_jwt="$REVIEWER_TOKEN" kubernetes_host=$(KUBECONFIG={{ kubernetes.config_file }} kubectl config view -o jsonpath="{.clusters[?(@.name==\"{{ kubernetes.context }}\")].cluster.server}") kubernetes_ca_cert=@"./build/{{ component_name }}.ca.cert"
+              
+
+
+              # Create policy
+              curl \
+                --header "X-Vault-Token: $VAULT_CLIENT_TOKEN" \
+                --request PUT \
+                --data '{"policy":"# Dev servers have version 2 of KV secrets engine mounted by default, so will\n# need these paths to grant permissions:\npath \"secret/data/*\" {\n  capabilities = [\"create\", \"update\"]\n}\n\npath \"secret/data/foo\" {\n  capabilities = [\"read\"]\n}\n"}' \
+                http://127.0.0.1:8200/v1/sys/policies/acl/my-policy
+                          
+              curl \
+                --header "X-Vault-Token: $VAULT_TOKEN" \
+                --request PUT \
+                --data '{"policy": "{{ $.Values.vault.policy_content }}"}' \
+                {{ $.Values.vault.address }}/v1/sys/policy/{{ $.Values.vault.policy }};
+
+
 
               vault_secret_key="${VAULT_SECRET_PREFIX}"
 
