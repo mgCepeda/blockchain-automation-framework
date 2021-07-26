@@ -95,9 +95,9 @@ spec:
 
               vault auth enable --path="${VAULT_ADDR}" kubernetes
 
-              KUBECONFIG={{ $.Values.k8s.config_file }} kubectl -n {{ $.Values.metadata.name }} get secrets $(KUBECONFIG={{ kubernetes.config_file }} kubectl -n {{ component_name }} get secrets | grep "default" | awk '{print $1}') -o jsonpath="{.data['ca\.crt']}" | base64 -d > "./build/{{ component_name }}.ca.cert"
+              KUBECONFIG={{ $.Values.k8s.config_file }} kubectl -n {{ $.Values.metadata.name }} get secrets $(KUBECONFIG={{ $.Values.k8s.config_file }} kubectl -n {{ component_name }} get secrets | grep "default" | awk '{print $1}') -o jsonpath="{.data['ca\.crt']}" | base64 -d > "./build/{{ component_name }}.ca.cert"
 
-              export REVIEWER_TOKEN=$(KUBECONFIG={{ kubernetes.config_file }} kubectl get secret $(KUBECONFIG={{ kubernetes.config_file }} kubectl get serviceaccount -n {{ component_name }} vault-reviewer -o jsonpath={.secrets[0].name}) -n {{ component_name }} -o  jsonpath={.data.token} | base64 -d)
+              export REVIEWER_TOKEN=$(KUBECONFIG={{ $.Values.k8s.config_file }} kubectl get secret $(KUBECONFIG={{  $.Values.k8s.config_file }} kubectl get serviceaccount -n {{ component_name }} vault-reviewer -o jsonpath={.secrets[0].name}) -n {{ component_name }} -o  jsonpath={.data.token} | base64 -d)
               vault write auth/${VAULT_ADDR}/config token_reviewer_jwt="$REVIEWER_TOKEN" kubernetes_host=$(KUBECONFIG={{ kubernetes.config_file }} kubectl config view -o jsonpath="{.clusters[?(@.name==\"{{ kubernetes.context }}\")].cluster.server}") kubernetes_ca_cert=@"./build/{{ component_name }}.ca.cert"
               
 
