@@ -66,6 +66,13 @@
     namespace: "{{ item.name | lower}}-net"
     vault: "{{ item.vault }}"
     kubernetes: "{{ item.k8s }}"
+    
+##############################################################################################
+# This tasks gets the kubernetes server url
+- name: Get the kubernetes server url
+  shell: |
+    KUBECONFIG={{ kubernetes.config_file }} kubectl config view --minify | grep server | cut -f 2- -d ":" | tr -d " "
+  register: kubernetes_server_url
 
 #####################################################################################################################
 # generate vault_kubernetes helmrelease file
