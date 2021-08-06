@@ -71,7 +71,7 @@ spec:
             
               KUBE_SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
               KUBE_SA_CERTIFICATE=$(cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt)
-              echo"----------------${VAULT_POLICY}---------------------"
+              echo"----------------${KUBERNETES_URL}---------------------"
 
               if [ $VAULT_AUTH_STATUS == 'false' ]; then
 
