@@ -71,10 +71,8 @@ spec:
             
               KUBE_SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
               KUBE_SA_CERTIFICATE=$(cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt)
-              echo"----------------${KUBERNETES_URL}---------------------"
 
               if [ $VAULT_AUTH_STATUS == 'false' ]; then
-
                 # This command enables the path for the organizations and orderers on vault
                 curl \
                 --header "X-Vault-Token: $ROOT_TOKEN" \
@@ -104,12 +102,9 @@ spec:
                 rm payload.json
 
                 validateVaultResponse ${response_status};
-
               fi;
 
               if [ $VAULT_POLICY == 'true' ]; then
-                echo "------------Need create vault policy----------"
-
                 if [ $COMPONENT_TYPE == 'orderer' ]; then
                   # This echo creates the access policy for orderers
                   echo "{\"policy\":\"path \\\"${VAULT_SECRET_PATH}/crypto/ordererOrganizations/${COMPONENT_NAME}/*\\\" {\n capabilities = [\\\"list\\\", \\\"read\\\"]\n} \
