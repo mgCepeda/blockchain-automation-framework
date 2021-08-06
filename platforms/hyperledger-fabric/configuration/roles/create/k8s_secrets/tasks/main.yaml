@@ -1,0 +1,35 @@
+#############################################################################################
+# This role creates the secrets necessary for the proper functioning of the 
+# setup/vault_kubernetes role
+#############################################################################################
+
+############################################################################################
+# This task put root token of every organization in their namespace
+- name: Check if root token exists in the namespace
+  shell: |
+    kubectl get secret roottoken --namespace {{ namespace }}
+  register: root_token_secret
+  ignore_errors: yes
+
+############################################################################################
+# This task put root token of every organization in their namespace
+- name: Put root token of every organization
+  shell: |
+    kubectl create secret generic roottoken --from-literal=token={{ vault.root_token }} --namespace {{ namespace }}
+  when: root_token_secret.failed == True
+
+#####################################################################################################################
+# Check if Docker credentials exist already
+- name: "Checking if the docker credentials already exists"
+  include_role:
+    name: "{{ playbook_dir }}/../../shared/configuration/roles/check/setup"
+  vars:
+    check: "docker_credentials"
+  register: get_regcred
+
+#####################################################################################################################
+# This task creates the docker pull credentials for image registry
+- name: Create the docker pull credentials
+  shell: |
+    KUBECONFIG={{ kubernetes.config_file }} kubectl create secret -n {{ namespace }} docker-registry regcred --docker-server={{ network.docker.url }} --docker-username={{ network.docker.username }} --docker-password={{ network.docker.password }} --docker-email="test@abc.mail"
+  when: get_regcred.resources|length == 0 
