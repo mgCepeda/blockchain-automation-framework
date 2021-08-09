@@ -35,5 +35,5 @@ spec:
       imagesecretname: regcred
     
     k8s:
-      kubernetes_url: {{ k8s.url }}
+      kubernetes_url: {{ kubernetes_url }}
       

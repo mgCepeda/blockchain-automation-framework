@@ -66,7 +66,7 @@
     namespace: "{{ item.name | lower}}-net"
     vault: "{{ item.vault }}"
     kubernetes: "{{ item.k8s }}"
-    
+
 ##############################################################################################
 # This tasks gets the kubernetes server url
 - name: Get the kubernetes server url
@@ -92,6 +92,7 @@
     charts_dir: "{{ item.gitops.chart_source }}"
     vault: "{{ item.vault }}"
     k8s: "{{ item.k8s }}"
+    kubernetes_url: "{{ kubernetes_server_url.stdout }}"
     fabrictools_image: "hyperledger/fabric-tools:{{ network.version }}"
     alpine_image: "{{ network.docker.url }}/alpine-utils:1.0"
     values_dir: "{{playbook_dir}}/../../../{{item.gitops.release_dir}}/{{ item.name | lower }}"
