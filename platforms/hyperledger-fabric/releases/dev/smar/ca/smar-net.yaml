@@ -1,0 +1,44 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: smar-net-ca
+  namespace: smar-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: smar-net-ca
+  chart:
+    git: https://github.com/mgCepeda/blockchain-automation-framework.git
+    ref: feature-1572
+    path: platforms/hyperledger-fabric/charts/ca    
+  values:
+    metadata:
+      namespace: smar-net
+      images:
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+        ca: hyperledger/fabric-ca:1.4.8
+    server:
+      name: ca
+      tlsstatus: true
+      admin: smar-admin
+    storage:
+      storageclassname: smarsc
+      storagesize: 512Mi 
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: marsmar-net-auth
+      secretcert: secret/crypto/ordererOrganizations/smar-net/ca?ca.smar-net-cert.pem
+      secretkey: secret/crypto/ordererOrganizations/smar-net/ca?smar-net-CA.key
+      secretadminpass: secret/credentials/smar-net/ca/smar?user
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+    service:
+      servicetype: ClusterIP
+      ports:
+        tcp:
+          port: 7054
+    proxy:
+      provider: haproxy
+      type: orderer
+      external_url_suffix: hf.dev2.aws.blockchaincloudpoc-develop.com
