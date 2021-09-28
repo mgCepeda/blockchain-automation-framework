@@ -106,7 +106,7 @@ data:
     ORG_HOME="${HOME}/ca-tools/${ORG_NAME}"
 
     ## Register and enroll node and populate its MSP folder
-    PEER="{{ peer_name }}.${FULLY_QUALIFIED_ORG_NAME}"
+    PEER="orderer1.${FULLY_QUALIFIED_ORG_NAME}"
     CSR_HOSTS=${PEER}
     for i in "${ALTERNATIVE_ORG_NAMES[@]}"
     do
