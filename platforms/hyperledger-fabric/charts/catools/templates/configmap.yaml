@@ -110,7 +110,7 @@ data:
     CSR_HOSTS=${PEER}
     for i in "${ALTERNATIVE_ORG_NAMES[@]}"
     do
-      CSR_HOSTS="${CSR_HOSTS},{{ peer_name }}.${i}"
+      CSR_HOSTS="${CSR_HOSTS},orderer1.${i}"
     done
     echo "Registering and enrolling $PEER with csr hosts ${CSR_HOSTS}"
 
@@ -136,7 +136,7 @@ data:
     # Create the TLS CA directories of the MSP folder if they don't exist.
     mkdir ${ORG_CYPTO_FOLDER}/orderers/${PEER}/msp/tlscacerts
 
-    if [ "{{ proxy }}" != "none" ]; then
+    if [  "${PROXY}" != "none" ]; then
       mv ${ORG_CYPTO_FOLDER}/orderers/${PEER}/msp/cacerts/*.pem ${ORG_CYPTO_FOLDER}/orderers/${PEER}/msp/cacerts/ca-${FULLY_QUALIFIED_ORG_NAME}-${EXTERNAL_URL_SUFFIX}-8443.pem
     fi
     cp ${ORG_CYPTO_FOLDER}/orderers/${PEER}/msp/cacerts/* ${ORG_CYPTO_FOLDER}/orderers/${PEER}/msp/tlscacerts
