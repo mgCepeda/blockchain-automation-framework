@@ -14,6 +14,17 @@
       - name = {{ component_name }}
   when: add_peer is not defined or add_peer != 'true'
 
+#############################################################################################
+# This task creates secrets for the root token and the reviewer token
+- name: "Create ca-tools secrets tokens"
+  include_role:
+    name: create/k8s_secrets
+  vars: 
+    namespace: "{{ item.name | lower }}-net"
+    vault: "{{ item.vault }}"
+    kubernetes: "{{ item.k8s }}"
+    check: "token_secret"
+
 ############################################################################################
 # This task creates the CA-tools value files
 - name: "Create CA-tools Values"
@@ -22,9 +33,21 @@
   vars:
     name: "ca-tools"
     type: "ca-tools"
+    org_name: "{{ item.name | lower }}"
+    component_type: "{{ item.type | lower }}"
+    vault: "{{ item.vault }}"
+    external_url_suffix: "{{ item.external_url_suffix }}"
+    component_subject: "{{ item.subject }}"
+    component_country: "{{ item.country }}"
+    component_state: "{{ item.state }}"
+    component_location: "{{ item.location }}"
+    ca_url: "{{ item.ca_data.url }}"
+    proxy: "{{ network.env.proxy }}"
+    alpine_image: "{{ network.docker.url }}/alpine-utils:1.0"
     git_url: "{{ gitops.git_url }}"
     git_branch: "{{ gitops.branch }}"
     charts_dir: "{{ gitops.chart_source }}"
+    orderers_list: "{{ item.services.orderers }}"
 
 #Git Push : Pushes the above generated files to git directory 
 - name: Git Push
@@ -35,3 +58,19 @@
     gitops: "{{ item.gitops }}"
     GIT_RESET_PATH: "platforms/hyperledger-fabric/configuration"
     msg: "[ci skip] Pushing CA-tools files"
+
+# Check if CA-tools pod is running
+- name: "Waiting for CA-tool in {{ item.name | lower }}-net"
+  include_role:
+    name: "{{ playbook_dir }}/../../shared/configuration/roles/check/helm_component"
+  vars:
+    component_type: "Pod"
+    namespace: "{{ item.name | lower }}-net"
+    component_name: "ca-tools"
+    label_selectors:
+      - name = {{ component_name }}
+  tags:
+    - notest
+
+- pause:
+    minutes: 640

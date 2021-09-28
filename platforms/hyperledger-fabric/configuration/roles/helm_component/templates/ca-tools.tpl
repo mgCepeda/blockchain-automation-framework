@@ -15,6 +15,9 @@ spec:
     metadata:
       namespace: {{ component_name }}
       name: ca-tools
+      component_type: {{ component_type }}
+      org_name: {{ org_name }}
+      proxy: "{{ proxy }}"
 {% if network.env.annotations is defined %}
     annotations:  
       service:
@@ -38,6 +41,9 @@ spec:
 {% endif %}
     replicaCount: 1
 
+    initimage:
+      alpineutils: {{ alpine_image }}
+
     image:
       repository: hyperledger/fabric-ca-tools
       tag: 1.2.1
@@ -46,3 +52,28 @@ spec:
     storage:
       storageclassname: {{ component | lower }}sc
       storagesize: 512Mi
+    
+    vault:
+      role: vault-role
+      address: {{ vault.url }}
+      authpath: {{ network.env.type }}{{ component_name }}-auth
+      secretmsp: {{ vault.secret_path | default('secret') }}/data/crypto/{{ component_type }}Organizations/{{ component_name }}/users/admin/msp
+      secrettls: {{ vault.secret_path | default('secret') }}/data/crypto/{{ component_type }}Organizations/{{ component_name }}/users/admin/tls
+      secretcert: {{ vault.secret_path | default('secret') }}/data/crypto/{{ component_type }}Organizations/{{ component_name | e }}/ca?ca.{{ component_name | e }}-cert.pem
+      secretkey: {{ vault.secret_path | default('secret') }}/data/crypto/{{ component_type }}Organizations/{{ component_name | e }}/ca?{{ component_name | e }}-CA.key
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+    
+    item:
+      external_url_suffix: {{ external_url_suffix }}
+      component_subject: {{ component_subject }}
+      component_country: {{ component_country }}
+      component_state: {{ component_state }}
+      component_location: {{ component_location }}
+      ca_url: {{ ca_url }}
+<<<<<<< HEAD
+    
+    orderers:
+      name: {% for name in orderers_list %} {{ name }} {% endfor %} 
+=======
+>>>>>>> bccfb6fd6aa7c408145ac19ed1a7ceef3db9a35a

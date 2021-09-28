@@ -44,3 +44,6 @@
     VAULT_ADDR: "{{ vault.url }}"
     VAULT_TOKEN: "{{ vault.root_token }}"
   when: vault_admin_result.failed == True and network.env.proxy == 'none'
+
+- pause:
+    minutes: 120

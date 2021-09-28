@@ -5,8 +5,18 @@ metadata:
   #Provide name for ca server deployment
   #Eg. name: ca-tools
   name:
+  #Provide organization's type (orderer or peer)
+  #Eg. namespace: orderer
+  component_type:
+  org_name:
+  proxy:
 # Provide the number of replica pods
 replicaCount: 1
+
+initimage:
+  #Provide the valid image name and version to read certificates from vault server
+  #Eg.alpineutils: hyperledgerlabs/alpine-utils:1.0
+  alpineutils:
 
 image:
   #Provide the image name for the server container
@@ -31,3 +41,40 @@ storage:
   #Eg. storagesize: 512Mi
   storagesize: 
 
+vault:
+  #Provide the vaultrole for an organization
+  #Eg. vaultrole: org1-vault-role
+  role:
+  #Provide the vault server address
+  #Eg. vaultaddress: http://Vault-884963190.eu-west-1.elb.amazonaws.com
+  address:
+  #Provide the kubernetes auth backed configured in vault for an organization
+  #Eg. authpath: fra-demo-hlkube-cluster-org1
+  authpath:
+  #Provide the secretcert path configured in vault for CA server
+  #Eg. secretcert: secret/crypto/Organizations/.../...-cert.pem
+  secretmsp:
+  secrettls: 
+  secretcert:
+  #Provide the secretkey path configured in vault for CA server
+  #Eg. secretkey: secret/crypto/Organizations/.../...-CA.key
+  secretkey:
+  #Provide the serviceaccountname for vault
+  #Eg. serviceaccountname: vault-auth
+  serviceaccountname:
+  #Provide the imagesecretname for vault
+  #Eg. imagesecretname: regcred
+  imagesecretname:
+  #Kuberenetes secret for vault ca.cert
+  #Enable or disable TLS for vault communication if value present or not
+
+item:
+  external_url_suffix:
+  component_subject:
+  component_country:
+  component_state:
+  component_location:
+  ca_url:
+
+orderers:
+      name: 

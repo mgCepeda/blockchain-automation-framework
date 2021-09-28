@@ -71,6 +71,21 @@
       loop: "{{ network['organizations'] }}"
       when: item.services.ca is defined
         
+    # Create generate_crypto script for each organization
+    - name: Create generate_crypto.sh for each organization
+      include_role:
+        name: "create/crypto_script"
+      vars:
+        component_type: "{{ item.type | lower}}"        
+        orderers: "{{ item.services.orderers }}"
+      loop: "{{ network['organizations'] }}"
+
+    #Creating a pause so that the client certificates are valid
+    # You can continue if the CA-server pods are running for more than 5 minutes
+    - pause:
+        prompt: "Sleeping... so that the client certificates are valid"
+        minutes: 6
+    
     # Create CA Tools helm-value files and check-in
     - name: Create CA tools for each organization
       include_role:
@@ -86,21 +101,6 @@
         gitops: "{{ item.gitops }}"
         values_dir: "{{playbook_dir}}/../../../{{item.gitops.release_dir}}/{{ item.name | lower }}"
       loop: "{{ network['organizations'] }}"
-
-    # Create generate_crypto script for each organization
-    - name: Create generate_crypto.sh for each organization
-      include_role:
-        name: "create/crypto_script"
-      vars:
-        component_type: "{{ item.type | lower}}"        
-        orderers: "{{ item.services.orderers }}"
-      loop: "{{ network['organizations'] }}"
-
-    #Creating a pause so that the client certificates are valid
-    # You can continue if the CA-server pods are running for more than 5 minutes
-    - pause:
-        prompt: "Sleeping... so that the client certificates are valid"
-        minutes: 6
 
     # Create Orderer crypto materials
     - name: Create crypto materials for each orderer

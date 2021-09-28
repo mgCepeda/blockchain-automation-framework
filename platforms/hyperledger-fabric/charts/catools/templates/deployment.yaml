@@ -28,18 +28,9 @@ spec:
       labels:
         name: {{ .Values.metadata.name }}
     spec:
-      containers:
-        - name: {{ .Values.metadata.name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["sh", "-c", "/bin/bash"]
-          stdin: true
-          tty: true
-          volumeMounts:
-          - mountPath: /root/ca-tools
-            name: ca-tools-pv
-          - mountPath: /crypto-config
-            name: ca-tools-crypto-pv
+      serviceAccountName: {{ $.Values.vault.serviceaccountname }}
+      imagePullSecrets:
+        - name: {{ $.Values.vault.imagesecretname }}
       volumes:
       - name: ca-tools-pv
         persistentVolumeClaim:
@@ -47,3 +38,276 @@ spec:
       - name: ca-tools-crypto-pv
         persistentVolumeClaim:
           claimName: ca-tools-crypto-pvc
+      - name: certcheck
+        emptyDir:
+          medium: Memory
+      - name: generate-crypto
+        configMap:
+          name: test-script-cm
+          defaultMode: 0775
+          items:
+            - key: generate-crypto.sh
+              path: generate-crypto.sh
+      initContainers:
+        - name: init-check-certificates
+          image: {{ $.Values.initimage.alpineutils }}
+          imagePullPolicy: IfNotPresent
+          env:
+          - name: VAULT_ADDR
+            value: {{ $.Values.vault.address }}
+          - name: VAULT_APP_ROLE
+            value: {{ $.Values.vault.role }}
+          - name: KUBERNETES_AUTH_PATH
+            value: {{ $.Values.vault.authpath }}
+          - name: VAULT_SECRET_MSP
+            value: {{ $.Values.vault.secretmsp }}
+          - name: COMPONENT_TYPE
+            value: {{ $.Values.metadata.component_type }}
+          - name: COMPONENT_NAME
+            value: {{ $.Values.metadata.namespace }}
+          - name: NAME
+            value: {{ $.Values.metadata.org_name }}
+          - name: MOUNT_PATH
+            value: "/certcheck"
+          command: ["sh", "-c"]
+          args:
+            - |-
+              #!/usr/bin/env sh
+              validateVaultResponse () {
+                if echo ${2} | grep "errors"; then
+                  echo "ERROR: unable to retrieve ${1}: ${2}"
+                  exit 1
+                fi
+                if  [ "$3" == "LOOKUPSECRETRESPONSE" ]
+                then
+                  http_code=$(curl -sS -o /dev/null -w "%{http_code}" \
+                  --header "X-Vault-Token: ${VAULT_TOKEN}" \
+                  ${VAULT_ADDR}/v1/${1})
+                  curl_response=$?
+                  if test "$http_code" != "200" ; then
+                      echo "Http response code from Vault - $http_code and curl_response - $curl_response"
+                      if test "$curl_response" != "0"; then
+                        echo "Error: curl command failed with error code - $curl_response"
+                        exit 1
+                      fi
+                  fi
+                fi
+              }
+
+              # Setting up the environment to get secrets/certificates from Vault
+              echo "Getting secrets/certificates from Vault server"
+              KUBE_SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+              VAULT_TOKEN=$(curl -sS --request POST ${VAULT_ADDR}/v1/auth/${KUBERNETES_AUTH_PATH}/login -H "Content-Type: application/json" -d '{"role":"'"${VAULT_APP_ROLE}"'","jwt":"'"${KUBE_SA_TOKEN}"'"}' | jq -r 'if .errors then . else .auth.client_token end')
+              validateVaultResponse 'vault login token' "${VAULT_TOKEN}"
+              echo "Logged into Vault"
+              
+              mkdir -p ${MOUNT_PATH}
+
+              echo "${VAULT_TOKEN}"
+              echo "${KUBE_SA_TOKEN}"
+             
+              # Check if certificates already present in the vault
+              LOOKUP_SECRET_RESPONSE=$(curl --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${VAULT_SECRET_MSP} | jq -r 'if .errors then . else . end')
+
+              if echo ${LOOKUP_SECRET_RESPONSE} | grep "errors"
+              then
+                echo "Certficates absent in vault. Ignore error warning"
+                touch ${MOUNT_PATH}/absent_msp.txt
+              elif echo ${LOOKUP_SECRET_RESPONSE} | grep "\"data\": null"
+              then
+                echo "Certficates absent in vault2. Ignore error warning"
+                touch ${MOUNT_PATH}/absent_msp.txt
+              else
+                validateVaultResponse "${VAULT_SECRET_CRYPTO_PATH}" "${LOOKUP_SECRET_RESPONSE}" "LOOKUPSECRETRESPONSE"
+                echo "Certificates present in vault"
+                touch ${MOUNT_PATH}/present_msp.txt
+              fi
+
+              if [ $COMPONENT_TYPE == 'orderer' ] && [ -e /certcheck/absent_msp.txt ]; then
+                  echo "meet the coditions"
+
+                  OUTPUT_PATH="/crypto-config/${COMPONENT_TYPE}Organizations/${COMPONENT_NAME}"
+                  mkdir -p ${OUTPUT_PATH}/ca
+                  mkdir -p /root/ca-tools/${NAME}
+  
+                  SECRET_CERT={{ $.Values.vault.secretcert }}
+                  vault_secret_key=$(echo ${SECRET_CERT} |awk -F "?" '{print $1}')
+                  vault_data_key=$(echo ${SECRET_CERT} |awk -F "?" '{print $2}')
+              
+                  LOOKUP_SECRET_RESPONSE=$(curl -sS \
+                      --header "X-Vault-Token: ${VAULT_TOKEN}" \
+                      ${VAULT_ADDR}/v1/${vault_secret_key} | \
+                      jq -r 'if .errors then . else . end')
+                  validateVaultResponse "${vault_secret_key}" "${LOOKUP_SECRET_RESPONSE}" "LOOKUPSECRETRESPONSE"
+                  VALUE_OF_SECRET=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r ".data.data[\"${vault_data_key}\"]")
+                  echo "${VALUE_OF_SECRET}" >> ${OUTPUT_PATH}/ca/ca.${COMPONENT_NAME}-cert.pem
+
+              fi;
+          volumeMounts:
+          - name: ca-tools-pv
+            mountPath: /root/ca-tools
+          - name: ca-tools-crypto-pv
+            mountPath: /crypto-config
+          - name: certcheck
+            mountPath: /certcheck
+      containers:
+        - name: {{ .Values.metadata.name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          - name: VAULT_ADDR
+            value: {{ $.Values.vault.address }}
+          - name: VAULT_APP_ROLE
+            value: {{ $.Values.vault.role }}
+          - name: KUBERNETES_AUTH_PATH
+            value: {{ $.Values.vault.authpath }}
+          - name: VAULT_SECRET_MSP
+            value: {{ $.Values.vault.secretmsp }}
+          - name: VAULT_SECRET_TLS
+            value: {{ $.Values.vault.secrettls }}
+          - name: COMPONENT_TYPE
+            value: {{ $.Values.metadata.component_type }}
+          - name: COMPONENT_NAME
+            value: {{ $.Values.metadata.namespace }}
+          - name: NAME
+            value: {{ $.Values.metadata.org_name }}
+          - name: PROXY
+            value: {{ .Values.metadata.proxy }}
+          - name: EXTERNAL_URL_SUFFIX
+            value: {{ .Values.item.external_url_suffix }}
+          - name: ENDORSING_ORG_NAMES
+            value: "{{ $.Values.orderers.name }}"
+          - name: ROOT_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: roottoken
+                key: token
+          command: ["sh", "-c"]
+          args:
+            - |-
+              
+              formatCertificate () {
+                NOMBRE="${1##*/}"
+                while IFS= read -r line
+                do
+                  echo  ${line}'\\n'
+                done < ${1} > ${2}/${NOMBRE}.txt
+              }
+              
+              if [ "$COMPONENT_TYPE" = "orderer" ] && [ -e /certcheck/absent_msp.txt ]; then
+
+                echo "Run generate-crypto.sh"
+                cd /root/ca-tools/${NAME} 
+                ./generate-crypto.sh
+
+                ORG_CYPTO_FOLDER_TLS="/crypto-config/ordererOrganizations/${COMPONENT_NAME}/users/Admin@${COMPONENT_NAME}/tls"
+                ORG_CYPTO_FOLDER_MSP="/crypto-config/ordererOrganizations/${COMPONENT_NAME}/users/Admin@${COMPONENT_NAME}/msp"
+
+                FORMAT_CERTIFICATE_PATH="/formatcertificate"
+                mkdir -p ${FORMAT_CERTIFICATE_PATH}/tls
+                mkdir -p ${FORMAT_CERTIFICATE_PATH}/msp
+                
+                formatCertificate "${ORG_CYPTO_FOLDER_TLS}/ca.crt" "${FORMAT_CERTIFICATE_PATH}/tls"
+                formatCertificate "${ORG_CYPTO_FOLDER_TLS}/client.crt" "${FORMAT_CERTIFICATE_PATH}/tls"
+                formatCertificate "${ORG_CYPTO_FOLDER_TLS}/client.key" "${FORMAT_CERTIFICATE_PATH}/tls"
+
+                CA_CRT=$(cat ${FORMAT_CERTIFICATE_PATH}/tls/ca.crt.txt)
+                CLIENT_CRT=$(cat ${FORMAT_CERTIFICATE_PATH}/tls/client.crt.txt)
+                CLIENT_KEY=$(cat ${FORMAT_CERTIFICATE_PATH}/tls/client.key.txt)
+
+                /bin/echo "
+                  {
+                    \"data\": 
+                      {
+                        \"ca.crt\": \"${CA_CRT}\",
+                        \"client.crt\": \"${CLIENT_CRT}\",
+                        \"client.key\": \"${CLIENT_KEY}\"
+                      }  
+                  }" > payload.json
+
+                # This command copy the tls certificates to the Vault
+                curl \
+                  -H "X-Vault-Token: $ROOT_TOKEN" \
+                  -H "Content-Type: application/json" \
+                  -X POST \
+                  -d @payload.json \
+                  ${VAULT_ADDR}/v1/${VAULT_SECRET_TLS}
+
+                  rm payload.json
+
+                SK_NAME=$(find ${ORG_CYPTO_FOLDER_MSP}/keystore/ -name "*_sk")
+  
+                formatCertificate "${ORG_CYPTO_FOLDER_MSP}/admincerts/Admin@${COMPONENT_NAME}-cert.pem" "${FORMAT_CERTIFICATE_PATH}/msp"
+                formatCertificate "${SK_NAME}" "${FORMAT_CERTIFICATE_PATH}/msp"
+                formatCertificate "${ORG_CYPTO_FOLDER_MSP}/signcerts/cert.pem" "${FORMAT_CERTIFICATE_PATH}/msp"
+
+                ADMINCERTS=$(cat ${FORMAT_CERTIFICATE_PATH}/msp/Admin@${COMPONENT_NAME}-cert.pem.txt)
+                KEYSTORE=$(cat ${FORMAT_CERTIFICATE_PATH}/msp/*_sk.txt)
+                SIGNCERTS=$(cat ${FORMAT_CERTIFICATE_PATH}/msp/cert.pem.txt)
+
+                if [ "$PROXY" != "none" ] ; then
+
+                   echo "---------------${PROXY}1--------------------------"
+
+                  formatCertificate "${ORG_CYPTO_FOLDER_MSP}/cacerts/ca-${COMPONENT_NAME}-${EXTERNAL_URL_SUFFIX}-8443.pem" "${FORMAT_CERTIFICATE_PATH}/msp"
+                  CACERTS=$(cat ${FORMAT_CERTIFICATE_PATH}/msp/ca-${COMPONENT_NAME}-${EXTERNAL_URL_SUFFIX}-8443.pem.txt)
+                  
+                    /bin/echo "
+                      {
+                        \"data\": 
+                          {
+                            \"admincerts\": \"${ADMINCERTS}\",
+                            \"cacerts\": \"${CACERTS}\",
+                            \" keystore\": \"${KEYSTORE}\",
+                            \"signcerts\": \"${SIGNCERTS}\",
+                            \"tlscacerts\": \"${CA_CRT}\"
+                          }  
+                      }" > payload.json
+                    
+                    echo "pppppppppppppppppppppppppppppppppp"
+                    cat payload.json
+                    echo "pppppppppppppppppppppppppppppppppp"
+
+                fi;
+
+                if [ "$PROXY" = "none" ] ; then
+                    echo "---------------${PROXY}2-------------------"
+
+                    formatCertificate "${ORG_CYPTO_FOLDER_MSP}/cacerts/ca-${COMPONENT_NAME}-7054.pem" "${FORMAT_CERTIFICATE_PATH}/msp"
+                    CACERTS=$(cat ${FORMAT_CERTIFICATE_PATH}/msp/ca-${COMPONENT_NAME}-7054.pem.txt)
+
+                    /bin/echo "
+                      {
+                        \"data\": 
+                          {
+                            \"admincerts\": \"${ADMINCERTS}\",
+                            \"cacerts\": \"${CACERTS}\",
+                            \" keystore\": \"${KEYSTORE}\",
+                            \"signcerts\": \"${SIGNCERTS}\",
+                            \"tlscacerts\": \"${CA_CRT}\"
+                          }  
+                      }" > payload.json
+                fi;
+
+                # This command copy the tls certificates to the Vault
+                curl \
+                  -H "X-Vault-Token: $ROOT_TOKEN" \
+                  -H "Content-Type: application/json" \
+                  -X POST \
+                  -d @payload.json \
+                  ${VAULT_ADDR}/v1/${VAULT_SECRET_MSP}
+
+              fi;
+              echo "ttttttttttttt${ENDORSING_ORG_NAMES}ttttttttttttttttttt"
+
+              tail -f /dev/null
+          volumeMounts:
+          - name: ca-tools-pv
+            mountPath: /root/ca-tools
+          - name: ca-tools-crypto-pv
+            mountPath: /crypto-config
+          - name: certcheck
+            mountPath: /certcheck
+          - name: generate-crypto
+            mountPath: /root/ca-tools/{{ $.Values.metadata.org_name }}/generate-crypto.sh
+            subPath: generate-crypto.sh
