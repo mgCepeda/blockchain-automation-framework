@@ -308,11 +308,12 @@ spec:
 
               fi;
   
-              mails=$(echo "$ORDERES_NAMES" | tr "-" "\n")
+              orderers=$(echo "$ORDERES_NAMES" | tr "-" "\n")
 
-              for addr in $mails
+              for orderer in $orderers
               do
-                  echo "$addr"
+                  ORDERER_NAME=$orderer
+                  echo "${ORDERER_NAME}"
               done
               tail -f /dev/null
           volumeMounts:
