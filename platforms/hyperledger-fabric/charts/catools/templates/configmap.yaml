@@ -23,8 +23,8 @@ data:
     SUBJECT="C={{ .Values.item.component_country }},ST={{ .Values.item.component_state }},L={{ .Values.item.component_location }},O={{ .Values.metadata.org_name }}"
     SUBJECT_PEER="{{ .Values.item.component_subject }}"
     CA="{{ .Values.item.ca_url }}"
-    CA_ADMIN_USER="${NAME}-admin"
-    CA_ADMIN_PASS="${NAME}-adminpw"
+    CA_ADMIN_USER="${ORG_NAME}-admin"
+    CA_ADMIN_PASS="${ORG_NAME}-adminpw"
     
     ORG_ADMIN_USER="Admin@${FULLY_QUALIFIED_ORG_NAME}"
     ORG_ADMIN_PASS="Admin@${FULLY_QUALIFIED_ORG_NAME}-pw"
@@ -91,8 +91,8 @@ data:
     SUBJECT="C={{ .Values.item.component_country }},ST={{ .Values.item.component_state }},L={{ .Values.item.component_location }},O={{ .Values.metadata.org_name }}"
     SUBJECT_PEER="{{ .Values.item.component_subject }}"
     CA="{{ .Values.item.ca_url }}"
-    CA_ADMIN_USER="${NAME}-admin"
-    CA_ADMIN_PASS="${NAME}-adminpw"
+    CA_ADMIN_USER="${ORG_NAME}-admin"
+    CA_ADMIN_PASS="${ORG_NAME}-adminpw"
 
     ORG_ADMIN_USER="Admin@${FULLY_QUALIFIED_ORG_NAME}"
     ORG_ADMIN_PASS="Admin@${FULLY_QUALIFIED_ORG_NAME}-pw"
