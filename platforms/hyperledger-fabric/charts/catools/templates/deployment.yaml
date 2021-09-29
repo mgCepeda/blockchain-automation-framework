@@ -299,13 +299,13 @@ spec:
 
               fi;
               echo "ttttttttttttt${ENDORSING_ORG_NAMES}ttttttttttttttttttt"
-              my_arr=$(echo $ENDORSING_ORG_NAMES | tr " ""\n")
 
-              for i in "${my_arr[@]}"  
+              readarray -d : -t strarr <<<"$ENDORSING_ORG_NAMES" #split a string based on the delimiter ':'   
+ 
+              #Print each value of Array with the help of loop  
+              for (( n=0; n < ${#strarr[*]}; n++ ))  
               do  
-              echo $i
-              ORDERER_NAME = $i
-              echo "-------${ORDERER_NAME}----------" 
+              echo "${strarr[n]}"  
               done  
 
               tail -f /dev/null
