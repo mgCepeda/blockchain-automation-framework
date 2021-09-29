@@ -106,11 +106,11 @@ data:
     ORG_HOME="${HOME}/ca-tools/${ORG_NAME}"
 
     ## Register and enroll node and populate its MSP folder
-    PEER="orderer1.${FULLY_QUALIFIED_ORG_NAME}"
+    PEER="${ORDERER_NAME}.${FULLY_QUALIFIED_ORG_NAME}"
     CSR_HOSTS=${PEER}
     for i in "${ALTERNATIVE_ORG_NAMES[@]}"
     do
-      CSR_HOSTS="${CSR_HOSTS},orderer1.${i}"
+      CSR_HOSTS="${CSR_HOSTS},${ORDERER_NAME}.${i}"
     done
     echo "Registering and enrolling $PEER with csr hosts ${CSR_HOSTS}"
 
@@ -176,8 +176,6 @@ data:
       ORG_CYPTO_FOLDER="/crypto-config/$1Organizations/${FULLY_QUALIFIED_ORG_NAME}"
       ROOT_TLS_CERT="/crypto-config/$1Organizations/${FULLY_QUALIFIED_ORG_NAME}/ca/ca.${FULLY_QUALIFIED_ORG_NAME}-cert.pem"
     fi
-
-
 
     CAS_FOLDER="${HOME}/ca-tools/cas/ca-${ORG_NAME}"
     ORG_HOME="${HOME}/ca-tools/${ORG_NAME}"

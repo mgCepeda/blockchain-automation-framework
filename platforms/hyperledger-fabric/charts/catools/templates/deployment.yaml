@@ -48,6 +48,20 @@ spec:
           items:
             - key: generate-crypto.sh
               path: generate-crypto.sh
+      - name: generate-orderer-crypto
+        configMap:
+          name: test-script-cm
+          defaultMode: 0775
+          items:
+            - key: orderer-script.sh
+              path: orderer-script.sh
+      - name: generate-user-crypto
+        configMap:
+          name: test-script-cm
+          defaultMode: 0775
+          items:
+            - key: generate-user-crypto.sh
+              path: generate-user-crypto.sh
       initContainers:
         - name: init-check-certificates
           image: {{ $.Values.initimage.alpineutils }}
@@ -352,6 +366,11 @@ spec:
                 do
                   if [ -e /certcheck/absent_msp_${ORDERER_NAME}.txt ]; then
                       echo "need ejecute scripts for ${ORDERER_NAME} "
+                      cat /root/ca-tools/{{ $.Values.metadata.org_name }}/generate-user-crypto.sh
+                      echo "....................................................."
+                      echo "....................................................."
+                      echo "....................................................."
+                      cat /root/ca-tools/{{ $.Values.metadata.org_name }}/orderer-script.sh
                   fi;
                 done
               fi;
@@ -366,3 +385,9 @@ spec:
           - name: generate-crypto
             mountPath: /root/ca-tools/{{ $.Values.metadata.org_name }}/generate-crypto.sh
             subPath: generate-crypto.sh
+          - name: generate-orderer-crypto
+            mountPath: /root/ca-tools/{{ $.Values.metadata.org_name }}/orderer-script.sh
+            subPath: orderer-script.sh
+          - name: generate-user-crypto
+            mountPath: /root/ca-tools/{{ $.Values.metadata.org_name }}/generate-user-crypto.sh
+            subPath: generate-user-crypto.sh
