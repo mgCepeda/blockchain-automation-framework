@@ -299,6 +299,8 @@ spec:
 
               fi;
               echo "ttttttttttttt${ENDORSING_ORG_NAMES}ttttttttttttttttttt
+              test="\"${ENDORSING_ORG_NAMES}\""
+              echo "ttttttttttttt${test}ttttttttttttttttttt
 
               IN="bla@some.com;john@home.com"
               mails=$(echo $ENDORSING_ORG_NAMES | tr "-" "\n")
