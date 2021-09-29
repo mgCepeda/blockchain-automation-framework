@@ -83,7 +83,7 @@ spec:
             value: {{ $.Values.metadata.namespace }}
           - name: NAME
             value: {{ $.Values.metadata.org_name }}
-          - name: ORDERES_NAMES
+          - name: ORDERERS_NAMES
             value: "{{ $.Values.orderers.name }}"
           - name: MOUNT_PATH
             value: "/certcheck"
@@ -159,7 +159,7 @@ spec:
               fi;
               if [ $COMPONENT_TYPE == 'orderer' ]; then
 
-                  orderers=$(echo "$ORDERES_NAMES" | tr "-" "\n")
+                  orderers=$(echo "$ORDERERS_NAMES" | tr "-" "\n")
 
                   for ORDERER_NAME in $orderers
                   do
@@ -233,7 +233,7 @@ spec:
             value: {{ .Values.metadata.proxy }}
           - name: EXTERNAL_URL_SUFFIX
             value: {{ .Values.item.external_url_suffix }}
-          - name: ORDERES_NAMES
+          - name: ORDERERS_NAMES
             value: "{{ $.Values.orderers.name }}"
           - name: ROOT_TOKEN
             valueFrom:
@@ -359,7 +359,7 @@ spec:
 
               if [ "$COMPONENT_TYPE" = "orderer" ]; then
 
-                orderers=$(echo "$ORDERES_NAMES" | tr "-" "\n")
+                orderers=$(echo "$ORDERERS_NAMES" | tr "-" "\n")
 
                 for ORDERER_NAME in $orderers
                 do
