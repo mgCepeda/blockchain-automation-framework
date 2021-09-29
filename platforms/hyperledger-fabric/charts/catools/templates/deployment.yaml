@@ -67,6 +67,8 @@ spec:
             value: {{ $.Values.metadata.namespace }}
           - name: NAME
             value: {{ $.Values.metadata.org_name }}
+          - name: ORDERES_NAMES
+            value: "{{ $.Values.orderers.name }}"
           - name: MOUNT_PATH
             value: "/certcheck"
           command: ["sh", "-c"]
@@ -102,10 +104,7 @@ spec:
               echo "Logged into Vault"
               
               mkdir -p ${MOUNT_PATH}
-
-              echo "${VAULT_TOKEN}"
-              echo "${KUBE_SA_TOKEN}"
-             
+           
               # Check if certificates already present in the vault
               LOOKUP_SECRET_RESPONSE=$(curl --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${VAULT_SECRET_MSP} | jq -r 'if .errors then . else . end')
 
@@ -141,8 +140,18 @@ spec:
                   validateVaultResponse "${vault_secret_key}" "${LOOKUP_SECRET_RESPONSE}" "LOOKUPSECRETRESPONSE"
                   VALUE_OF_SECRET=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r ".data.data[\"${vault_data_key}\"]")
                   echo "${VALUE_OF_SECRET}" >> ${OUTPUT_PATH}/ca/ca.${COMPONENT_NAME}-cert.pem
+              fi;
+              if [ $COMPONENT_TYPE == 'orderer' ]; then
+
+                  orderers=$(echo "$ORDERES_NAMES" | tr "-" "\n")
+
+                  for orderer in $orderers
+                  do
+                      echo "$orderer"
+                  done
 
               fi;
+
           volumeMounts:
           - name: ca-tools-pv
             mountPath: /root/ca-tools
@@ -175,7 +184,7 @@ spec:
             value: {{ .Values.metadata.proxy }}
           - name: EXTERNAL_URL_SUFFIX
             value: {{ .Values.item.external_url_suffix }}
-          - name: ENDORSING_ORG_NAMES
+          - name: ORDERES_NAMES
             value: "{{ $.Values.orderers.name }}"
           - name: ROOT_TOKEN
             valueFrom:
@@ -282,7 +291,7 @@ spec:
                           {
                             \"admincerts\": \"${ADMINCERTS}\",
                             \"cacerts\": \"${CACERTS}\",
-                            \" keystore\": \"${KEYSTORE}\",
+                            \"keystore\": \"${KEYSTORE}\",
                             \"signcerts\": \"${SIGNCERTS}\",
                             \"tlscacerts\": \"${CA_CRT}\"
                           }  
@@ -299,7 +308,7 @@ spec:
 
               fi;
   
-              mails=$(echo "$ENDORSING_ORG_NAMES" | tr "-" "\n")
+              mails=$(echo "$ORDERES_NAMES" | tr "-" "\n")
 
               for addr in $mails
               do
