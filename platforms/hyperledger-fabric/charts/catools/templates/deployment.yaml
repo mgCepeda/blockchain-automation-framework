@@ -110,10 +110,6 @@ spec:
               # Check if certificates already present in the vault
               LOOKUP_SECRET_RESPONSE=$(curl --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${VAULT_SECRET_MSP} | jq -r 'if .errors then . else . end')
 
-              echo "-----------------------------"
-              echo ${LOOKUP_SECRET_RESPONSE}
-              echo "-----------------------------"
-
               if echo ${LOOKUP_SECRET_RESPONSE} | grep "errors"
               then
                 echo "Certficates absent in vault. Ignore error warning"
@@ -123,7 +119,7 @@ spec:
                 echo "Certficates absent in vault2. Ignore error warning"
                 touch ${MOUNT_PATH}/absent_msp.txt
               else
-                validateVaultResponse "${VAULT_SECRET_CRYPTO_PATH}" "${LOOKUP_SECRET_RESPONSE}" "LOOKUPSECRETRESPONSE"
+                validateVaultResponse "${VAULT_SECRET_MSP}" "${LOOKUP_SECRET_RESPONSE}" "LOOKUPSECRETRESPONSE"
                 echo "Certificates present in vault"
                 touch ${MOUNT_PATH}/present_msp.txt
               fi
