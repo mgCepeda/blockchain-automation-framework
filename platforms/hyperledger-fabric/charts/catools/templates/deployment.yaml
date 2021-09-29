@@ -235,6 +235,8 @@ spec:
             value: {{ .Values.item.external_url_suffix }}
           - name: ORDERERS_NAMES
             value: "{{ $.Values.orderers.name }}"
+          - name: TEST
+            value: {{ .Values.test.name }}
           - name: ROOT_TOKEN
             valueFrom:
               secretKeyRef:
@@ -373,6 +375,7 @@ spec:
                   fi;
                 done
               fi;
+              echo "---------------${TEST}--------------------------"
               tail -f /dev/null
           volumeMounts:
           - name: ca-tools-pv
