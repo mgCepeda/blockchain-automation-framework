@@ -1,0 +1,57 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: smar-net-ca-tools
+  namespace: smar-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: smar-net-ca-tools
+  chart:
+    git: https://github.com/mgCepeda/blockchain-automation-framework.git
+    ref: feature-1574
+    path: platforms/hyperledger-fabric/charts/catools
+  values:
+    metadata:
+      namespace: smar-net
+      name: ca-tools
+      component_type: orderer
+      org_name: smar
+      proxy: "haproxy"
+    replicaCount: 1
+
+    initimage:
+      alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+
+    image:
+      repository: hyperledger/fabric-ca-tools
+      tag: 1.2.1
+      pullPolicy: IfNotPresent
+      
+    storage:
+      storageclassname: smarsc
+      storagesize: 512Mi
+    
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: marsmar-net-auth
+      secretmsp: secretsv2/data/crypto/ordererOrganizations/smar-net/users/admin/msp
+      secrettls: secretsv2/data/crypto/ordererOrganizations/smar-net/users/admin/tls
+      orderermsp: secretsv2/data/crypto/ordererOrganizations/smar-net/orderers/
+      orderertls: secretsv2/data/crypto/ordererOrganizations/smar-net/orderers/
+      secretcert: secretsv2/data/crypto/ordererOrganizations/smar-net/ca?ca.smar-net-cert.pem
+      secretkey: secretsv2/data/crypto/ordererOrganizations/smar-net/ca?smar-net-CA.key
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+    
+    item:
+      external_url_suffix: hf.dev2.aws.blockchaincloudpoc-develop.com
+      component_subject: O=Orderer,L=51.50/-0.13/London,C=GB
+      component_country: UK
+      component_state: London
+      component_location: London
+      ca_url: ca.smar-net:7054
+    
+    orderers:
+      name: orderer1-orderer2-orderer3-  
