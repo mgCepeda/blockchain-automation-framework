@@ -43,21 +43,21 @@ spec:
           medium: Memory
       - name: generate-crypto
         configMap:
-          name: test-script-cm
+          name: orderers-script-cm
           defaultMode: 0775
           items:
             - key: generate-crypto.sh
               path: generate-crypto.sh
       - name: generate-orderer-crypto
         configMap:
-          name: test-script-cm
+          name: orderers-script-cm
           defaultMode: 0775
           items:
             - key: orderer-script.sh
               path: orderer-script.sh
       - name: generate-user-crypto
         configMap:
-          name: test-script-cm
+          name: orderers-script-cm
           defaultMode: 0775
           items:
             - key: generate-user-crypto.sh
@@ -357,7 +357,6 @@ spec:
 
               fi;
 
-                
               if [ "$COMPONENT_TYPE" = "orderer" ]; then
 
                 orderers=$(echo "$ORDERES_NAMES" | tr "-" "\n")

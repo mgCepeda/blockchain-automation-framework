@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: test-script-cm
+  name: orderers-script-cm
   namespace: {{ .Values.metadata.namespace }}
   labels:
     app.kubernetes.io/name: test-script
@@ -18,7 +18,7 @@ data:
     CURRENT_DIR=${PWD}
     FULLY_QUALIFIED_ORG_NAME="{{ .Values.metadata.namespace }}"
     EXTERNAL_URL_SUFFIX="{{ .Values.item.external_url_suffix }}"
-    ALTERNATIVE_ORG_NAMES="({{ .Values.item.external_url_suffix }})"
+    ALTERNATIVE_ORG_NAMES="{{ .Values.item.external_url_suffix }}"
     ORG_NAME="{{ .Values.metadata.org_name }}"
     SUBJECT="C={{ .Values.item.component_country }},ST={{ .Values.item.component_state }},L={{ .Values.item.component_location }},O={{ .Values.metadata.org_name }}"
     SUBJECT_PEER="{{ .Values.item.component_subject }}"
@@ -86,7 +86,7 @@ data:
     CURRENT_DIR=${PWD}
     FULLY_QUALIFIED_ORG_NAME="{{ .Values.metadata.namespace }}"
     EXTERNAL_URL_SUFFIX="{{ .Values.item.external_url_suffix }}"
-    ALTERNATIVE_ORG_NAMES="({{ .Values.item.external_url_suffix }})"
+    ALTERNATIVE_ORG_NAMES="{{ .Values.item.external_url_suffix }}"
     ORG_NAME="{{ .Values.metadata.org_name }}"
     SUBJECT="C={{ .Values.item.component_country }},ST={{ .Values.item.component_state }},L={{ .Values.item.component_location }},O={{ .Values.metadata.org_name }}"
     SUBJECT_PEER="{{ .Values.item.component_subject }}"
