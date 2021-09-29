@@ -55,8 +55,7 @@ vault:
   #Eg. secretcert: secret/crypto/Organizations/.../...-cert.pem
   secretmsp:
   secrettls: 
-  orderermsp: 
-  orderertls: 
+  secretorderer: 
   secretcert:
   #Provide the secretkey path configured in vault for CA server
   #Eg. secretkey: secret/crypto/Organizations/.../...-CA.key
