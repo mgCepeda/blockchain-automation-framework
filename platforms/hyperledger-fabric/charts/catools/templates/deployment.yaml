@@ -61,6 +61,8 @@ spec:
             value: {{ $.Values.vault.authpath }}
           - name: VAULT_SECRET_MSP
             value: {{ $.Values.vault.secretmsp }}
+          - name: VAULT_SECRET_ORDERER_MSP
+            value: {{ $.Values.vault.orderermsp }}
           - name: COMPONENT_TYPE
             value: {{ $.Values.metadata.component_type }}
           - name: COMPONENT_NAME
@@ -108,6 +110,10 @@ spec:
               # Check if certificates already present in the vault
               LOOKUP_SECRET_RESPONSE=$(curl --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${VAULT_SECRET_MSP} | jq -r 'if .errors then . else . end')
 
+              echo "-----------------------------"
+              echo ${LOOKUP_SECRET_RESPONSE}
+              echo "-----------------------------"
+
               if echo ${LOOKUP_SECRET_RESPONSE} | grep "errors"
               then
                 echo "Certficates absent in vault. Ignore error warning"
@@ -147,7 +153,9 @@ spec:
 
                   for orderer in $orderers
                   do
-                      echo "$orderer"
+                      ORDERER_NAME=$orderer
+                      echo "${ORDERER_NAME}"
+                      echo "${VAULT_SECRET_ORDERER_MSP}${ORDERER_NAME}.${COMPONENT_NAME}/msp"  
                   done
 
               fi;
