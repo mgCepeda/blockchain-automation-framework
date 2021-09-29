@@ -298,12 +298,7 @@ spec:
                   ${VAULT_ADDR}/v1/${VAULT_SECRET_MSP}
 
               fi;
-              echo "ttttttttttttt${ENDORSING_ORG_NAMES}ttttttttttttttttttt"
-              test="\"${ENDORSING_ORG_NAMES}\""
-              echo "ttttttttttttt${test}ttttttttttttttttttttttt"
-              echo "iiiiiiiiiiii${ENDORSING_ORG_NAMES}iiiiiiiiiii"
-
-              IN="bla@some.com;john@home.com"
+  
               mails=$(echo "$ENDORSING_ORG_NAMES" | tr "-" "\n")
 
               for addr in $mails
