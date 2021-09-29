@@ -71,9 +71,7 @@ spec:
       component_state: {{ component_state }}
       component_location: {{ component_location }}
       ca_url: {{ ca_url }}
-<<<<<<< HEAD
     
     orderers:
-      name: {% for name in orderers_list %} {{ name }} {% endfor %} 
-=======
->>>>>>> bccfb6fd6aa7c408145ac19ed1a7ceef3db9a35a
+      name: {% for orderer in orderers_list %}{% for key, value in orderer.items() %}{% if key == 'name' %}{{ value }} {% endif %}{% endfor %}{% endfor %}
+  

@@ -258,7 +258,7 @@ spec:
                           {
                             \"admincerts\": \"${ADMINCERTS}\",
                             \"cacerts\": \"${CACERTS}\",
-                            \" keystore\": \"${KEYSTORE}\",
+                            \"keystore\": \"${KEYSTORE}\",
                             \"signcerts\": \"${SIGNCERTS}\",
                             \"tlscacerts\": \"${CA_CRT}\"
                           }  
@@ -299,6 +299,14 @@ spec:
 
               fi;
               echo "ttttttttttttt${ENDORSING_ORG_NAMES}ttttttttttttttttttt"
+              my_arr=($(echo $ENDORSING_ORG_NAMES | tr " ""\n")) 
+
+              for i in "${my_arr[@]}"  
+              do  
+              echo $i
+              ORDERER_NAME = $i
+              echo "-------${ORDERER_NAME}----------" 
+              done  
 
               tail -f /dev/null
           volumeMounts:
