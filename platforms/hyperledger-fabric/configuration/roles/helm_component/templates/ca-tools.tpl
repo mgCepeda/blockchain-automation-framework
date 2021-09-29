@@ -76,4 +76,6 @@ spec:
     
     orderers:
       name: {% for orderer in orderers_list %}{% for key, value in orderer.items() %}{% if key == 'name' %}{{ value }}-{% endif %}{% endfor %}{% endfor %}
-  
+
+    test:
+      name: test

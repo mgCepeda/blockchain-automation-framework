@@ -149,10 +149,7 @@ spec:
 
                   for ORDERER_NAME in $orderers
                   do
-                      echo "${ORDERER_NAME}"
-                      echo "${VAULT_SECRET_ORDERER_MSP}${ORDERER_NAME}.${COMPONENT_NAME}/msp"
-                      echo "${VAULT_SECRET_ORDERER_MSP}${ORDERER_NAME}.${COMPONENT_NAME}/tls"
-                      
+                   
                       # Check if certificates already present in the vault
                       LOOKUP_SECRET_RESPONSE=$(curl --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${VAULT_SECRET_ORDERER_MSP}${ORDERER_NAME}.${COMPONENT_NAME}/msp | jq -r 'if .errors then . else . end')
 
@@ -294,7 +291,7 @@ spec:
 
                 if [ "$PROXY" != "none" ] ; then
 
-                   echo "---------------${PROXY}1--------------------------"
+                  echo "---------------${PROXY}1--------------------------"
 
                   formatCertificate "${ORG_CYPTO_FOLDER_MSP}/cacerts/ca-${COMPONENT_NAME}-${EXTERNAL_URL_SUFFIX}-8443.pem" "${FORMAT_CERTIFICATE_PATH}/msp"
                   CACERTS=$(cat ${FORMAT_CERTIFICATE_PATH}/msp/ca-${COMPONENT_NAME}-${EXTERNAL_URL_SUFFIX}-8443.pem.txt)
@@ -345,13 +342,19 @@ spec:
                   ${VAULT_ADDR}/v1/${VAULT_SECRET_MSP}
 
               fi;
-  
-              orderers=$(echo "$ORDERES_NAMES" | tr "-" "\n")
 
-              for ORDERER_NAME in $orderers
-              do
-                  echo "${ORDERER_NAME}"
-              done
+                
+              if [ "$COMPONENT_TYPE" = "orderer" ]; then
+
+                orderers=$(echo "$ORDERES_NAMES" | tr "-" "\n")
+
+                for ORDERER_NAME in $orderers
+                do
+                  if [ -e /certcheck/absent_msp_${ORDERER_NAME}.txt ]; then
+                      echo "need ejecute scripts for ${ORDERER_NAME} "
+                  fi;
+                done
+              fi;
               tail -f /dev/null
           volumeMounts:
           - name: ca-tools-pv
