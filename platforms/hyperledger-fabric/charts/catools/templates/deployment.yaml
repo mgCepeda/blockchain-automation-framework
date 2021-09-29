@@ -147,18 +147,14 @@ spec:
 
                   orderers=$(echo "$ORDERES_NAMES" | tr "-" "\n")
 
-                  for orderer in $orderers
+                  for ORDERER_NAME in $orderers
                   do
-                      ORDERER_NAME=$orderer
                       echo "${ORDERER_NAME}"
                       echo "${VAULT_SECRET_ORDERER_MSP}${ORDERER_NAME}.${COMPONENT_NAME}/msp"
+                      echo "${VAULT_SECRET_ORDERER_MSP}${ORDERER_NAME}.${COMPONENT_NAME}/tls"
                       
                       # Check if certificates already present in the vault
                       LOOKUP_SECRET_RESPONSE=$(curl --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${VAULT_SECRET_ORDERER_MSP}${ORDERER_NAME}.${COMPONENT_NAME}/msp | jq -r 'if .errors then . else . end')
-
-                      echo "-------------------------------"
-                      ${LOOKUP_SECRET_RESPONSE}
-                      echo "-------------------------------"
 
                       if echo ${LOOKUP_SECRET_RESPONSE} | grep "errors"
                       then
@@ -172,7 +168,24 @@ spec:
                         validateVaultResponse "${VAULT_ADDR}/v1/${VAULT_SECRET_ORDERER_MSP}${ORDERER_NAME}.${COMPONENT_NAME}/msp" "${LOOKUP_SECRET_RESPONSE}" "LOOKUPSECRETRESPONSE"
                         echo "Certificates present in vault"
                         touch ${MOUNT_PATH}/present_msp_${ORDERER_NAME}.txt
-                      fi  
+                      fi
+
+                      # Check if certificates already present in the vault
+                      LOOKUP_SECRET_RESPONSE=$(curl --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${VAULT_SECRET_ORDERER_MSP}${ORDERER_NAME}.${COMPONENT_NAME}/tls | jq -r 'if .errors then . else . end')
+
+                      if echo ${LOOKUP_SECRET_RESPONSE} | grep "errors"
+                      then
+                        echo "Certficates absent in vault. Ignore error warning"
+                        touch ${MOUNT_PATH}/absent_tls_${ORDERER_NAME}.txt
+                      elif echo ${LOOKUP_SECRET_RESPONSE} | grep "\"data\": null"
+                      then
+                        echo "Certficates absent in vault2. Ignore error warning"
+                        touch ${MOUNT_PATH}/absent_tls_${ORDERER_NAME}.txt
+                      else
+                        validateVaultResponse "${VAULT_ADDR}/v1/${VAULT_SECRET_ORDERER_MSP}${ORDERER_NAME}.${COMPONENT_NAME}/tls" "${LOOKUP_SECRET_RESPONSE}" "LOOKUPSECRETRESPONSE"
+                        echo "Certificates present in vault"
+                        touch ${MOUNT_PATH}/present_tls_${ORDERER_NAME}.txt
+                      fi    
                   done
 
               fi;
