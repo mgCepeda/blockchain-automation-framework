@@ -300,7 +300,7 @@ spec:
               fi;
               echo "ttttttttttttt${ENDORSING_ORG_NAMES}ttttttttttttttttttt"
 
-              readarray -d : -t strarr <<<"$ENDORSING_ORG_NAMES" #split a string based on the delimiter ':'   
+              readarray -d - -t strarr <<<"$ENDORSING_ORG_NAMES" #split a string based on the delimiter ':'   
  
               #Print each value of Array with the help of loop  
               for (( n=0; n < ${#strarr[*]}; n++ ))  
