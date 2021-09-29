@@ -299,7 +299,7 @@ spec:
 
               fi;
               echo "ttttttttttttt${ENDORSING_ORG_NAMES}ttttttttttttttttttt"
-              my_arr=($(echo $ENDORSING_ORG_NAMES | tr " ""\n")) 
+              my_arr=$(echo $ENDORSING_ORG_NAMES | tr " ""\n")
 
               for i in "${my_arr[@]}"  
               do  
