@@ -243,11 +243,10 @@ spec:
           command: ["sh", "-c", "/bin/bash"]
           args:
             - |-
-              
-     
+
                 echo "Run generate-crypto.sh"
                 cd /root/ca-tools/${NAME} 
-                cat ./generate-crypto.sh
+                cat generate-crypto.sh
 
               tail -f /dev/null
           volumeMounts:
