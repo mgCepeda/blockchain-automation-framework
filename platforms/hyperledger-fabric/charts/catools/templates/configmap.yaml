@@ -201,5 +201,13 @@ data:
       mkdir -p ${ORG_CYPTO_FOLDER}/users/${ORG_USER}
       cp -R ${ORG_HOME}/client${USER}/msp ${ORG_CYPTO_FOLDER}/users/${ORG_USER}
 
+      # Get TLS cert for user and copy to appropriate location
+      fabric-ca-client enroll -d --enrollment.profile tls -u https://${ORG_USER}:${ORG_USERPASS}@${CA} -M ${ORG_HOME}/client${USER}/tls --tls.certfiles ${ROOT_TLS_CERT}
+
+      # Copy the TLS key and cert to the appropriate place
+      mkdir -p ${ORG_CYPTO_FOLDER}/users/${ORG_USER}/tls
+      cp ${ORG_HOME}/client${USER}/tls/keystore/* ${ORG_CYPTO_FOLDER}/users/${ORG_USER}/tls/client.key
+      cp ${ORG_HOME}/client${USER}/tls/signcerts/* ${ORG_CYPTO_FOLDER}/users/${ORG_USER}/tls/client.crt
+      cp ${ORG_HOME}/client${USER}/tls/tlscacerts/* ${ORG_CYPTO_FOLDER}/users/${ORG_USER}/tls/ca.crt
     done
     cd ${CURRENT_DIR}
