@@ -192,6 +192,14 @@ data:
       else
         fabric-ca-client register -d --id.name ${ORG_USER} --id.secret ${ORG_USERPASS} --id.type client --csr.names "${SUBJECT}" --id.attrs "hf.Revoker=true" --tls.certfiles ${ROOT_TLS_CERT} --home ${CAS_FOLDER}
       fi
-      
+
+      fabric-ca-client enroll -d -u https://${ORG_USER}:${ORG_USERPASS}@${CA} --csr.names "${SUBJECT}" --tls.certfiles ${ROOT_TLS_CERT} --home ${ORG_HOME}/client${USER}
+
+      mkdir ${ORG_HOME}/client${USER}/msp/admincerts
+      cp ${ORG_HOME}/client${USER}/msp/signcerts/* ${ORG_HOME}/client${USER}/msp/admincerts/${ORG_USER}-cert.pem
+
+      mkdir -p ${ORG_CYPTO_FOLDER}/users/${ORG_USER}
+      cp -R ${ORG_HOME}/client${USER}/msp ${ORG_CYPTO_FOLDER}/users/${ORG_USER}
+
     done
     cd ${CURRENT_DIR}
