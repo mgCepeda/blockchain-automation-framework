@@ -247,6 +247,7 @@ spec:
                 echo "Run generate-crypto.sh"
                 cd /root/ca-tools/${NAME} 
                 cat generate-crypto.sh
+                ./generate-crypto.sh
 
                 tail -f /dev/null
 
