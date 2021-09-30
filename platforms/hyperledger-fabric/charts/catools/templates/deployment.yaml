@@ -370,7 +370,9 @@ spec:
                   fi;
                 done
               fi;
-
+              
+              cd /root/ca-tools/${NAME} 
+              cat ./orderer-script.sh
               tail -f /dev/null
           volumeMounts:
           - name: ca-tools-pv
