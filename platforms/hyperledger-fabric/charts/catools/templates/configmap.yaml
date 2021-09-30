@@ -28,7 +28,6 @@ data:
     
     ORG_ADMIN_USER="Admin@${FULLY_QUALIFIED_ORG_NAME}"
     ORG_ADMIN_PASS="Admin@${FULLY_QUALIFIED_ORG_NAME}-pw"
-    PROXY="{{ .Values.metadata.proxy }}"
 
     ORG_CYPTO_FOLDER="/crypto-config/ordererOrganizations/${FULLY_QUALIFIED_ORG_NAME}"
 
@@ -63,7 +62,7 @@ data:
     mkdir -p ${ORG_CYPTO_FOLDER}/users/${ORG_ADMIN_USER}
     cp -R ${ORG_HOME}/admin/msp ${ORG_CYPTO_FOLDER}/users/${ORG_ADMIN_USER}
 
-    if [ "${PROXY}" != "none" ]; then
+    if [ "{{ .Values.metadata.proxy }}" != "none" ]; then
         mv ${ORG_CYPTO_FOLDER}/users/${ORG_ADMIN_USER}/msp/cacerts/*.pem ${ORG_CYPTO_FOLDER}/users/${ORG_ADMIN_USER}/msp/cacerts/ca-${FULLY_QUALIFIED_ORG_NAME}-${EXTERNAL_URL_SUFFIX}-8443.pem
     fi
 
@@ -97,7 +96,6 @@ data:
 
     ORG_ADMIN_USER="Admin@${FULLY_QUALIFIED_ORG_NAME}"
     ORG_ADMIN_PASS="Admin@${FULLY_QUALIFIED_ORG_NAME}-pw"
-    PROXY="{{ .Values.metadata.proxy }}"
 
     ORG_CYPTO_FOLDER="/crypto-config/ordererOrganizations/${FULLY_QUALIFIED_ORG_NAME}"
 
@@ -122,12 +120,13 @@ data:
     fabric-ca-client enroll -d --enrollment.profile tls -u https://${PEER}:${PEER}-pw@${CA} -M ${ORG_HOME}/cas/orderers/tls --csr.hosts "${CSR_HOSTS}" --tls.certfiles ${ROOT_TLS_CERT} --csr.names "${SUBJECT_PEER}"
 
     # Copy the TLS key and cert to the appropriate place
-    mkdir -p ${ORG_CYPTO_FOLDER}/orderers/${PEER}/tls
-    cp ${ORG_HOME}/cas/orderers/tls/keystore/* ${ORG_CYPTO_FOLDER}/orderers/${PEER}/tls/server.key
-    cp ${ORG_HOME}/cas/orderers/tls/signcerts/* ${ORG_CYPTO_FOLDER}/orderers/${PEER}/tls/server.crt
-    cp ${ORG_HOME}/cas/orderers/tls/tlscacerts/* ${ORG_CYPTO_FOLDER}/orderers/${PEER}/tls/ca.crt
+    mkdir -p ${ORG_CYPTO_FOLDER}/orderers/${PEER}/tls/${ORDERER_NAME}
+    cp ${ORG_HOME}/cas/orderers/tls/keystore/* ${ORG_CYPTO_FOLDER}/orderers/${PEER}/tls/${ORDERER_NAME}/server.key
+    cp ${ORG_HOME}/cas/orderers/tls/signcerts/* ${ORG_CYPTO_FOLDER}/orderers/${PEER}/tls/${ORDERER_NAME}/server.crt
+    cp ${ORG_HOME}/cas/orderers/tls/tlscacerts/* ${ORG_CYPTO_FOLDER}/orderers/${PEER}/tls/${ORDERER_NAME}/ca.crt
 
     rm -rf ${ORG_HOME}/cas/orderers/tls
+
 
   generate-user-crypto.sh: |-
     #!/bin/bash
