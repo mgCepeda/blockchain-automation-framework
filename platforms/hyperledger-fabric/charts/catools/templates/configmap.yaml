@@ -11,14 +11,14 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
 data:
   generate-crypto.sh: |-
-    #!/bin/sh
+    #!/bin/bash
 
     set -x
 
     CURRENT_DIR=${PWD}
     FULLY_QUALIFIED_ORG_NAME="{{ .Values.metadata.namespace }}"
     EXTERNAL_URL_SUFFIX="{{ .Values.item.external_url_suffix }}"
-    ALTERNATIVE_ORG_NAMES="{{ .Values.item.external_url_suffix }}"
+    ALTERNATIVE_ORG_NAMES=("{{ .Values.item.external_url_suffix }}")
     ORG_NAME="{{ .Values.metadata.org_name }}"
     SUBJECT="C={{ .Values.item.component_country }},ST={{ .Values.item.component_state }},L={{ .Values.item.component_location }},O={{ .Values.metadata.org_name }}"
     SUBJECT_PEER="{{ .Values.item.component_subject }}"
