@@ -235,8 +235,6 @@ spec:
             value: {{ .Values.item.external_url_suffix }}
           - name: ORDERERS_NAMES
             value: "{{ $.Values.orderers.name }}"
-          - name: TEST
-            value: {{ .Values.test.name }}
           - name: ROOT_TOKEN
             valueFrom:
               secretKeyRef:
@@ -367,15 +365,10 @@ spec:
                 do
                   if [ -e /certcheck/absent_msp_${ORDERER_NAME}.txt ]; then
                       echo "need ejecute scripts for ${ORDERER_NAME} "
-                      cat /root/ca-tools/{{ $.Values.metadata.org_name }}/generate-user-crypto.sh
-                      echo "....................................................."
-                      echo "....................................................."
-                      echo "....................................................."
-                      cat /root/ca-tools/{{ $.Values.metadata.org_name }}/orderer-script.sh
                   fi;
                 done
               fi;
-              echo "---------------${TEST}--------------------------"
+
               tail -f /dev/null
           volumeMounts:
           - name: ca-tools-pv
