@@ -366,13 +366,14 @@ spec:
                       echo "need ejecute scripts for ${ORDERER_NAME} "
                       cd /root/ca-tools/${NAME} 
                       ./orderer-script.sh ${ORDERER_NAME}
-                    
+                      echo "--------------------------------"
+                      echo "--------------------------------"
+                      echo "--------------------------------"
+                      ./generate-user-crypto.sh ${ORDERER_NAME} ${COMPONENT_NAME} ${COMPONENT_NAME} 1${COMPONENT_NAME} "{{subject}}" "{{ca_url}}"
                   fi;
                 done
               fi;
-              
-              cd /root/ca-tools/${NAME} 
-              cat ./orderer-script.sh
+
               tail -f /dev/null
           volumeMounts:
           - name: ca-tools-pv
