@@ -93,6 +93,7 @@ data:
     CA="{{ .Values.item.ca_url }}"
     CA_ADMIN_USER="${ORG_NAME}-admin"
     CA_ADMIN_PASS="${ORG_NAME}-adminpw"
+    ORDERER_NAME=$1
 
     ORG_ADMIN_USER="Admin@${FULLY_QUALIFIED_ORG_NAME}"
     ORG_ADMIN_PASS="Admin@${FULLY_QUALIFIED_ORG_NAME}-pw"
@@ -104,6 +105,8 @@ data:
 
     CAS_FOLDER="${HOME}/ca-tools/cas/ca-${ORG_NAME}"
     ORG_HOME="${HOME}/ca-tools/${ORG_NAME}"
+
+    echo "---------${ORDERER_NAME}---------"
 
     ## Register and enroll node and populate its MSP folder
     PEER="${ORDERER_NAME}.${FULLY_QUALIFIED_ORG_NAME}"

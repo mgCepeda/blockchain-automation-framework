@@ -366,7 +366,7 @@ spec:
                   if [ -e /certcheck/absent_msp_${ORDERER_NAME}.txt ]; then
                       echo "need ejecute scripts for ${ORDERER_NAME} "
                       cd /root/ca-tools/${NAME} 
-                      ./orderer-script.sh
+                      ./orderer-script.sh ${ORDERER_NAME}
                       
                   fi;
                 done
