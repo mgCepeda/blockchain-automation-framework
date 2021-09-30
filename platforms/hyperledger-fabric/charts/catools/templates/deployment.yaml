@@ -240,7 +240,7 @@ spec:
               secretKeyRef:
                 name: roottoken
                 key: token
-          command: ["sh", "-c"]
+          command: ["sh", "-c", "/bin/bash"]
           args:
             - |-
               
@@ -356,23 +356,6 @@ spec:
                   ${VAULT_ADDR}/v1/${VAULT_SECRET_MSP}
 
               fi;
-
-              if [ "$COMPONENT_TYPE" = "orderer" ]; then
-
-                orderers=$(echo "$ORDERERS_NAMES" | tr "-" "\n")
-
-                for ORDERER_NAME in $orderers
-                do
-                  if [ -e /certcheck/absent_msp_${ORDERER_NAME}.txt ]; then
-
-                      echo "need ejecute scripts for ${ORDERER_NAME} "
-                      cd /root/ca-tools/${NAME} 
-                      ./orderer-script.sh ${ORDERER_NAME}
-                      
-                  fi;
-                done
-              fi;
-
               tail -f /dev/null
           volumeMounts:
           - name: ca-tools-pv
