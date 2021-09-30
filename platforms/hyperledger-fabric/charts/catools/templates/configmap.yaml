@@ -120,10 +120,10 @@ data:
     fabric-ca-client enroll -d --enrollment.profile tls -u https://${PEER}:${PEER}-pw@${CA} -M ${ORG_HOME}/cas/orderers/tls --csr.hosts "${CSR_HOSTS}" --tls.certfiles ${ROOT_TLS_CERT} --csr.names "${SUBJECT_PEER}"
 
     # Copy the TLS key and cert to the appropriate place
-    mkdir -p ${ORG_CYPTO_FOLDER}/orderers/${PEER}/tls/${ORDERER_NAME}
-    cp ${ORG_HOME}/cas/orderers/tls/keystore/* ${ORG_CYPTO_FOLDER}/orderers/${PEER}/tls/${ORDERER_NAME}/server.key
-    cp ${ORG_HOME}/cas/orderers/tls/signcerts/* ${ORG_CYPTO_FOLDER}/orderers/${PEER}/tls/${ORDERER_NAME}/server.crt
-    cp ${ORG_HOME}/cas/orderers/tls/tlscacerts/* ${ORG_CYPTO_FOLDER}/orderers/${PEER}/tls/${ORDERER_NAME}/ca.crt
+    mkdir -p ${ORG_CYPTO_FOLDER}/orderers/${PEER}/tls
+    cp ${ORG_HOME}/cas/orderers/tls/keystore/* ${ORG_CYPTO_FOLDER}/orderers/${PEER}/tls/server.key
+    cp ${ORG_HOME}/cas/orderers/tls/signcerts/* ${ORG_CYPTO_FOLDER}/orderers/${PEER}/tls/server.crt
+    cp ${ORG_HOME}/cas/orderers/tls/tlscacerts/* ${ORG_CYPTO_FOLDER}/orderers/${PEER}/tls/ca.crt
 
     rm -rf ${ORG_HOME}/cas/orderers/tls
 
