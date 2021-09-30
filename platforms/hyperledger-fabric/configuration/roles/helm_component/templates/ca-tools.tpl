@@ -17,7 +17,8 @@ spec:
       name: ca-tools
       component_type: {{ component_type }}
       org_name: {{ org_name }}
-      proxy: "{{ proxy }}"
+      org_name_not_lower: {{ org_name_not_lower }}
+      proxy: {{ proxy }}
 {% if network.env.annotations is defined %}
     annotations:  
       service:

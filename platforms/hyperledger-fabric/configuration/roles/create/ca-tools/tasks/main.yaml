@@ -34,6 +34,7 @@
     name: "ca-tools"
     type: "ca-tools"
     org_name: "{{ item.name | lower }}"
+    org_name_not_lower: "{{ item.name }}"
     component_type: "{{ item.type | lower }}"
     vault: "{{ item.vault }}"
     external_url_suffix: "{{ item.external_url_suffix }}"
