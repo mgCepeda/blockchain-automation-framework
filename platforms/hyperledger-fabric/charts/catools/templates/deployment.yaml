@@ -240,7 +240,7 @@ spec:
               secretKeyRef:
                 name: roottoken
                 key: token
-          command: ["sh", "-c", "/bin/bash"]
+          command: ["sh", "-c"]
           args:
             - |-
 
