@@ -240,15 +240,15 @@ spec:
               secretKeyRef:
                 name: roottoken
                 key: token
-          command: ["sh", "-c"]
+          command: ["sh", "-c", "/bin/bash"]
           args:
             - |-
+                tail -f /dev/null
 
                 echo "Run generate-crypto.sh"
                 cd /root/ca-tools/${NAME} 
                 cat generate-crypto.sh
 
-                tail -f /dev/null
           volumeMounts:
           - name: ca-tools-pv
             mountPath: /root/ca-tools
