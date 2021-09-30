@@ -248,7 +248,7 @@ spec:
                 cd /root/ca-tools/${NAME} 
                 cat generate-crypto.sh
 
-              tail -f /dev/null
+                tail -f /dev/null
           volumeMounts:
           - name: ca-tools-pv
             mountPath: /root/ca-tools
