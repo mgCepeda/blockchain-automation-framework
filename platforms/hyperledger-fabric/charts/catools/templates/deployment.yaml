@@ -324,7 +324,7 @@ spec:
                     
                     echo "pppppppppppppppppppppppppppppppppp"
                     cat payload.json
-                    echo "ppppppppppppppppppppppppppppppppppppp"
+                    echo "ppppppppppppppppppppppppppppppppp"
 
                 fi;
 
