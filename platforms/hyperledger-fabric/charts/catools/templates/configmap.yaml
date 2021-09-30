@@ -112,8 +112,6 @@ data:
     do
       aux=$(printf '%s\n' "$i")
       echo "+++++${aux}++++++"
-      CSR_HOSTS="${CSR_HOSTS},${ORDERER_NAME}.${aux}"
-      echo "---------${CSR_HOSTS}---------"
     done
   
    
