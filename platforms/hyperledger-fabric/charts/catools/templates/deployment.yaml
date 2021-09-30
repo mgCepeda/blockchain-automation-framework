@@ -358,9 +358,8 @@ spec:
               fi;
 
               if [ "$COMPONENT_TYPE" = "orderer" ]; then
-                ORG_CYPTO_FOLDER="/crypto-config/ordererOrganizations/${COMPONENT_NAME}
-                orderers=$(echo "$ORDERERS_NAMES" | tr "-" "\n")
-                
+   
+                orderers=$(echo "$ORDERERS_NAMES" | tr "-" "\n")         
                 for ORDERER_NAME in $orderers
                 do
                   if [ -e /certcheck/absent_msp_${ORDERER_NAME}.txt ]; then
