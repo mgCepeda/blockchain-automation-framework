@@ -5,6 +5,7 @@ metadata:
   #Provide name for ca server deployment
   #Eg. name: ca-tools
   name:
+  org_name_not_lower:
   #Provide organization's type (orderer or peer)
   #Eg. namespace: orderer
   component_type:

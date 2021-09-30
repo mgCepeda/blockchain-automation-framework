@@ -229,12 +229,18 @@ spec:
             value: {{ $.Values.metadata.namespace }}
           - name: NAME
             value: {{ $.Values.metadata.org_name }}
+          - name: NAME_NOT_LOWER
+            value: {{ $.Values.metadata.org_name_not_lower }}
           - name: PROXY
             value: {{ .Values.metadata.proxy }}
           - name: EXTERNAL_URL_SUFFIX
             value: {{ .Values.item.external_url_suffix }}
           - name: ORDERERS_NAMES
             value: "{{ $.Values.orderers.name }}"
+          - name: SUBJECT
+            value: {{ .Values.item.component_subject }}
+          - name: CA_URL
+            value: {{ .Values.item.ca_url }}
           - name: ROOT_TOKEN
             valueFrom:
               secretKeyRef:
@@ -369,11 +375,12 @@ spec:
                       echo "--------------------------------"
                       echo "--------------------------------"
                       echo "--------------------------------"
-                      ./generate-user-crypto.sh ${ORDERER_NAME} ${COMPONENT_NAME} ${COMPONENT_NAME} 1${COMPONENT_NAME} "{{subject}}" "{{ca_url}}"
+                      ./generate-user-crypto.sh ${ORDERER_NAME} ${COMPONENT_NAME} ${NAME} 1 ${NAME_NOT_LOWER} ${SUBJECT} ${CA_URL}
+                                            
                   fi;
                 done
               fi;
-
+      
               tail -f /dev/null
           volumeMounts:
           - name: ca-tools-pv
