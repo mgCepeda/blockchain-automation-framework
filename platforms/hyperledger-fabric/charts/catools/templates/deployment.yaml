@@ -368,6 +368,7 @@ spec:
                       cd /root/ca-tools/${NAME} 
                       ./orderer-script.sh 
                       
+                      
                   fi;
                 done
               fi;
