@@ -108,10 +108,12 @@ data:
     ## Register and enroll node and populate its MSP folder
     PEER="${ORDERER_NAME}.${FULLY_QUALIFIED_ORG_NAME}"
     CSR_HOSTS=${PEER}
-    for i in ${ALTERNATIVE_ORG_NAMES[@]}
+    for i in ${ALTERNATIVE_ORG_NAMES}
     do
       aux=$(printf '%s\n' "$i")
       echo "+++++${aux}++++++"
+      CSR_HOSTS="${CSR_HOSTS},${ORDERER_NAME}.${aux}"
+      echo "---------${CSR_HOSTS}---------"
     done
   
    
