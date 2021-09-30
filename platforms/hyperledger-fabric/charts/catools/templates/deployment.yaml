@@ -324,7 +324,7 @@ spec:
                     
                     echo "pppppppppppppppppppppppppppppppppp"
                     cat payload.json
-                    echo "pppppppppppppppppppppppppppppppppppppppppp"
+                    echo "ppppppppppppppppppppppppppppppppppppp"
 
                 fi;
 
@@ -364,7 +364,7 @@ spec:
                 for ORDERER_NAME in $orderers
                 do
                   if [ -e /certcheck/absent_msp_${ORDERER_NAME}.txt ]; then
-                  
+
                       echo "need ejecute scripts for ${ORDERER_NAME} "
                       cd /root/ca-tools/${NAME} 
                       ./orderer-script.sh ${ORDERER_NAME}
