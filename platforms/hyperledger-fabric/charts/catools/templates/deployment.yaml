@@ -200,7 +200,7 @@ spec:
                   done
 
               fi;
-
+              touch ${MOUNT_PATH}/finish_flag3.txt
           volumeMounts:
           - name: ca-tools-pv
             mountPath: /root/ca-tools
@@ -382,6 +382,7 @@ spec:
               echo "+++++++++++++++++++++++++++"
               echo "**************${MOUNT_PATH}"
               touch ${MOUNT_PATH}/finish_flag.txt
+              touch ${MOUNT_PATH}/finish_flag2.txt
               ls ${MOUNT_PATH}
               echo "+++++++++++++++++++++++++++"
               tail -f /dev/null
