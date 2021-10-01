@@ -378,6 +378,7 @@ spec:
                 done
               fi;
               echo "+++++++++++++++++++++++++++"
+              ls  ${MOUNT_PATH}
               touch ${MOUNT_PATH}/flag_finish.txt
               ls  ${MOUNT_PATH}
               echo "+++++++++++++++++++++++++++++++++++"
@@ -448,8 +449,9 @@ spec:
               while ! [ -f /${MOUNT_PATH}/flag_finish.txt ]
               do
                 echo 'Cemento Fresco, no hay letrero más bello… bueno, sólo Alto Voltaje.'
-                sleep 5s
+                sleep 1s
               done
+
               if [ -e /${MOUNT_PATH}/flag_finish.txt ]; then
                   echo "exits"
               fi;
