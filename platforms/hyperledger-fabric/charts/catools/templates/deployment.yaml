@@ -380,7 +380,9 @@ spec:
                 done
               fi;
               echo "+++++++++++++++++++++++++++"
+              echo "**************${MOUNT_PATH}"
               touch ${MOUNT_PATH}/finish_flag.txt
+              ls ${MOUNT_PATH}
               echo "+++++++++++++++++++++++++++"
               tail -f /dev/null
           volumeMounts:
