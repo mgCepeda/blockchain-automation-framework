@@ -384,11 +384,6 @@ spec:
                 done
               fi;
               echo "+++++++++++++++++++++++++++"
-              echo "**************${MOUNT_PATH}"
-              touch ${MOUNT_PATH}/finish_flag.txt
-              touch ${MOUNT_PATH}/finish_flag2.txt
-              ls ${MOUNT_PATH}
-              echo "+++++++++++++++++++++++++++"
               mkdir -p ${FLAG_PATH}/finish_flag4.txt
               ls /FLAG_PATH
               echo "+++++++++++++++++++++++++++++++++++"
@@ -401,7 +396,7 @@ spec:
           - name: certcheck
             mountPath: /certcheck
           - name: flag
-            mountPath: /flag/finish_flag4.txt
+            mountPath: /flag/finish_flag.txt
           - name: generate-crypto
             mountPath: /root/ca-tools/{{ $.Values.metadata.org_name }}/generate-crypto.sh
             subPath: generate-crypto.sh
@@ -457,7 +452,6 @@ spec:
               }
               
               echo "testing new container"
-              ls /certcheck
               ls /flag
               tail -f /dev/null
           volumeMounts:
@@ -468,4 +462,4 @@ spec:
           - name: certcheck
             mountPath: /certcheck
           - name: flag
-            mountPath: /flag/finish_flag4.txt
+            mountPath: /flag/finish_flag.txt
