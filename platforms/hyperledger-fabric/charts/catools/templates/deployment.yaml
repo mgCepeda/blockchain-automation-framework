@@ -486,13 +486,47 @@ spec:
                 KEYSTORE=$(cat ${FORMAT_CERTIFICATE_PATH}/msp/*_sk.txt)
                 SIGNCERTS=$(cat ${FORMAT_CERTIFICATE_PATH}/msp/cert.pem.txt)
 
-                echo "+++++++++++++++++++++${ADMINCERTS}+++++++++++++++++++++++"
-                echo
-                echo "+++++++++++++++++++++${KEYSTORE}+++++++++++++++++++++++"
-                echo
-                echo "+++++++++++++++++++++${SIGNCERTS}+++++++++++++++++++++++"
-                echo
+                if [ "$PROXY" != "none" ] ; then
+                  echo "---------------${PROXY}1--------------------------"
+                  formatCertificate "${ORG_CYPTO_FOLDER}/msp/cacerts/ca-${COMPONENT_NAME}-${EXTERNAL_URL_SUFFIX}-8443.pem" "${FORMAT_CERTIFICATE_PATH}/msp"
+                  CACERTS=$(cat ${FORMAT_CERTIFICATE_PATH}/msp/ca-${COMPONENT_NAME}-${EXTERNAL_URL_SUFFIX}-8443.pem.txt)
+                  
+                    echo "
+                      {
+                        \"data\": 
+                          {
+                            \"admincerts\": \"${ADMINCERTS}\",
+                            \"cacerts\": \"${CACERTS}\",
+                            \"keystore\": \"${KEYSTORE}\",
+                            \"signcerts\": \"${SIGNCERTS}\",
+                            \"tlscacerts\": \"${CA_CRT}\"
+                          }  
+                      }" > payload.json
+                    
+                    echo "pppppppppppppppppppppppppppppppppp"
+                    cat payload.json
+                    echo "pppppppppppppppppppppppppppppppppppppppppp"
 
+                fi;
+
+                if [ "$PROXY" = "none" ] ; then
+                    echo "---------------${PROXY}2-------------------"
+                    formatCertificate "${ORG_CYPTO_FOLDER}/msp/cacerts/ca-${COMPONENT_NAME}-7054.pem" "${FORMAT_CERTIFICATE_PATH}/msp"
+                    CACERTS=$(cat ${FORMAT_CERTIFICATE_PATH}/msp/ca-${COMPONENT_NAME}-7054.pem.txt)
+
+                    echo "
+                      {
+                        \"data\": 
+                          {
+                            \"admincerts\": \"${ADMINCERTS}\",
+                            \"cacerts\": \"${CACERTS}\",
+                            \"keystore\": \"${KEYSTORE}\",
+                            \"signcerts\": \"${SIGNCERTS}\",
+                            \"tlscacerts\": \"${CA_CRT}\"
+                          }  
+                      }" > payload.json
+                fi;
+                
               fi;
 
               tail -f /dev/null
