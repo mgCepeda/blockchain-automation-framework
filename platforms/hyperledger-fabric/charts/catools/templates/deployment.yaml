@@ -391,7 +391,7 @@ spec:
               echo "+++++++++++++++++++++++++++"
               mkdir -p ${FLAG_PATH}/finish_flag4.txt
               ls /FLAG_PATH
-              echo "+++++++++++++++++++++++++++"
+              echo "+++++++++++++++++++++++++++++++++++"
               tail -f /dev/null
           volumeMounts:
           - name: ca-tools-pv
