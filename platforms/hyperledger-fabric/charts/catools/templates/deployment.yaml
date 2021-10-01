@@ -377,11 +377,7 @@ spec:
                   fi;
                 done
               fi;
-              echo "+++++++++++++++++++++++++++"
-              ls  ${MOUNT_PATH}
               touch ${MOUNT_PATH}/flag_finish.txt
-              ls  ${MOUNT_PATH}
-              echo "+++++++++++++++++++++++++++++++++++"
               tail -f /dev/null
           volumeMounts:
           - name: ca-tools-pv
@@ -444,16 +440,37 @@ spec:
                 done < ${1} > ${2}/${NOMBRE}.txt
               }
               
-              echo "testing new container"
-
               while ! [ -f /${MOUNT_PATH}/flag_finish.txt ]
               do
-                echo 'Cemento Fresco, no hay letrero más bello… bueno, sólo Alto Voltaje.'
-                sleep 1s
+                echo 'Waiting for completion of scripts'
+                sleep 2s
               done
 
               if [ -e /${MOUNT_PATH}/flag_finish.txt ]; then
-                  echo "exits"
+
+                /bin/echo "--------exits-------"
+                  
+                ORG_CYPTO_FOLDER="/crypto-config/ordererOrganizations/${COMPONENT_NAME}/users/Admin@${COMPONENT_NAME}"
+
+                FORMAT_CERTIFICATE_PATH="/formatcertificate"
+                mkdir -p ${FORMAT_CERTIFICATE_PATH}/tls
+                mkdir -p ${FORMAT_CERTIFICATE_PATH}/msp
+                
+                formatCertificate "${ORG_CYPTO_FOLDER}/tls/ca.crt" "${FORMAT_CERTIFICATE_PATH}/tls"
+                formatCertificate "${ORG_CYPTO_FOLDER}/tls/client.crt" "${FORMAT_CERTIFICATE_PATH}/tls"
+                formatCertificate "${ORG_CYPTO_FOLDER}/tls/client.key" "${FORMAT_CERTIFICATE_PATH}/tls"
+
+                CA_CRT=$(cat ${FORMAT_CERTIFICATE_PATH}/tls/ca.crt.txt)
+                CLIENT_CRT=$(cat ${FORMAT_CERTIFICATE_PATH}/tls/client.crt.txt)
+                CLIENT_KEY=$(cat ${FORMAT_CERTIFICATE_PATH}/tls/client.key.txt)
+
+                echo "*********************${CA_CRT}***********"
+                echo 
+                echo "*********************${CLIENT_CRT}***********"
+                echo 
+                echo "*********************${CLIENT_KEY}***********"
+                echo 
+
               fi;
 
               tail -f /dev/null
