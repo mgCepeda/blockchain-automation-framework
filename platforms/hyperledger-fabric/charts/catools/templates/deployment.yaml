@@ -448,7 +448,7 @@ spec:
 
               if [ -e /${MOUNT_PATH}/flag_finish.txt ]; then
 
-                /bin/echo "--------exits-------"
+                echo "--------exits-------"
                   
                 ORG_CYPTO_FOLDER="/crypto-config/ordererOrganizations/${COMPONENT_NAME}/users/Admin@${COMPONENT_NAME}"
 
@@ -463,14 +463,19 @@ spec:
                 CA_CRT=$(cat ${FORMAT_CERTIFICATE_PATH}/tls/ca.crt.txt)
                 CLIENT_CRT=$(cat ${FORMAT_CERTIFICATE_PATH}/tls/client.crt.txt)
                 CLIENT_KEY=$(cat ${FORMAT_CERTIFICATE_PATH}/tls/client.key.txt)
+                echo "
+                  {
+                    \"data\": 
+                      {
+                        \"ca.crt\": \"${CA_CRT}\",
+                        \"client.crt\": \"${CLIENT_CRT}\",
+                        \"client.key\": \"${CLIENT_KEY}\"
+                      }  
+                  }" > payload.json
 
-                echo "*********************${CA_CRT}*******.......****"
-                echo 
-                echo "*********************${CLIENT_CRT}***********"
-                echo 
-                echo "*********************${CLIENT_KEY}***********"
-                echo 
-
+                    echo "pppppppppppppppppppppppppppppppppp"
+                    cat payload.json
+                    echo "pppppppppppppppppppppppppppppppppppppppppp"
               fi;
 
               tail -f /dev/null
