@@ -250,117 +250,13 @@ spec:
           command: ["sh", "-c"]
           args:
             - |-
-              
-              formatCertificate () {
-                NOMBRE="${1##*/}"
-                while IFS= read -r line
-                do
-                  echo  ${line}'\\n'
-                done < ${1} > ${2}/${NOMBRE}.txt
-              }
-              
+            
               if [ "$COMPONENT_TYPE" = "orderer" ] && [ -e /certcheck/absent_msp.txt ]; then
 
                 echo "Run generate-crypto.sh"
                 cd /root/ca-tools/${NAME} 
                 ./generate-crypto.sh
-
-                ORG_CYPTO_FOLDER_TLS="/crypto-config/ordererOrganizations/${COMPONENT_NAME}/users/Admin@${COMPONENT_NAME}/tls"
-                ORG_CYPTO_FOLDER_MSP="/crypto-config/ordererOrganizations/${COMPONENT_NAME}/users/Admin@${COMPONENT_NAME}/msp"
-
-                FORMAT_CERTIFICATE_PATH="/formatcertificate"
-                mkdir -p ${FORMAT_CERTIFICATE_PATH}/tls
-                mkdir -p ${FORMAT_CERTIFICATE_PATH}/msp
                 
-                formatCertificate "${ORG_CYPTO_FOLDER_TLS}/ca.crt" "${FORMAT_CERTIFICATE_PATH}/tls"
-                formatCertificate "${ORG_CYPTO_FOLDER_TLS}/client.crt" "${FORMAT_CERTIFICATE_PATH}/tls"
-                formatCertificate "${ORG_CYPTO_FOLDER_TLS}/client.key" "${FORMAT_CERTIFICATE_PATH}/tls"
-
-                CA_CRT=$(cat ${FORMAT_CERTIFICATE_PATH}/tls/ca.crt.txt)
-                CLIENT_CRT=$(cat ${FORMAT_CERTIFICATE_PATH}/tls/client.crt.txt)
-                CLIENT_KEY=$(cat ${FORMAT_CERTIFICATE_PATH}/tls/client.key.txt)
-
-                /bin/echo "
-                  {
-                    \"data\": 
-                      {
-                        \"ca.crt\": \"${CA_CRT}\",
-                        \"client.crt\": \"${CLIENT_CRT}\",
-                        \"client.key\": \"${CLIENT_KEY}\"
-                      }  
-                  }" > payload.json
-
-                # This command copy the tls certificates to the Vault
-                curl \
-                  -H "X-Vault-Token: $ROOT_TOKEN" \
-                  -H "Content-Type: application/json" \
-                  -X POST \
-                  -d @payload.json \
-                  ${VAULT_ADDR}/v1/${VAULT_SECRET_TLS}
-
-                  rm payload.json
-
-                SK_NAME=$(find ${ORG_CYPTO_FOLDER_MSP}/keystore/ -name "*_sk")
-  
-                formatCertificate "${ORG_CYPTO_FOLDER_MSP}/admincerts/Admin@${COMPONENT_NAME}-cert.pem" "${FORMAT_CERTIFICATE_PATH}/msp"
-                formatCertificate "${SK_NAME}" "${FORMAT_CERTIFICATE_PATH}/msp"
-                formatCertificate "${ORG_CYPTO_FOLDER_MSP}/signcerts/cert.pem" "${FORMAT_CERTIFICATE_PATH}/msp"
-
-                ADMINCERTS=$(cat ${FORMAT_CERTIFICATE_PATH}/msp/Admin@${COMPONENT_NAME}-cert.pem.txt)
-                KEYSTORE=$(cat ${FORMAT_CERTIFICATE_PATH}/msp/*_sk.txt)
-                SIGNCERTS=$(cat ${FORMAT_CERTIFICATE_PATH}/msp/cert.pem.txt)
-
-                if [ "$PROXY" != "none" ] ; then
-
-                  echo "---------------${PROXY}1--------------------------"
-
-                  formatCertificate "${ORG_CYPTO_FOLDER_MSP}/cacerts/ca-${COMPONENT_NAME}-${EXTERNAL_URL_SUFFIX}-8443.pem" "${FORMAT_CERTIFICATE_PATH}/msp"
-                  CACERTS=$(cat ${FORMAT_CERTIFICATE_PATH}/msp/ca-${COMPONENT_NAME}-${EXTERNAL_URL_SUFFIX}-8443.pem.txt)
-                  
-                    /bin/echo "
-                      {
-                        \"data\": 
-                          {
-                            \"admincerts\": \"${ADMINCERTS}\",
-                            \"cacerts\": \"${CACERTS}\",
-                            \"keystore\": \"${KEYSTORE}\",
-                            \"signcerts\": \"${SIGNCERTS}\",
-                            \"tlscacerts\": \"${CA_CRT}\"
-                          }  
-                      }" > payload.json
-                    
-                    echo "pppppppppppppppppppppppppppppppppp"
-                    cat payload.json
-                    echo "pppppppppppppppppppppppppppppppppppppppppp"
-                fi;
-
-                if [ "$PROXY" = "none" ] ; then
-                    echo "---------------${PROXY}2-------------------"
-
-                    formatCertificate "${ORG_CYPTO_FOLDER_MSP}/cacerts/ca-${COMPONENT_NAME}-7054.pem" "${FORMAT_CERTIFICATE_PATH}/msp"
-                    CACERTS=$(cat ${FORMAT_CERTIFICATE_PATH}/msp/ca-${COMPONENT_NAME}-7054.pem.txt)
-
-                    /bin/echo "
-                      {
-                        \"data\": 
-                          {
-                            \"admincerts\": \"${ADMINCERTS}\",
-                            \"cacerts\": \"${CACERTS}\",
-                            \"keystore\": \"${KEYSTORE}\",
-                            \"signcerts\": \"${SIGNCERTS}\",
-                            \"tlscacerts\": \"${CA_CRT}\"
-                          }  
-                      }" > payload.json
-                fi;
-
-                # This command copy the tls certificates to the Vault
-                curl \
-                  -H "X-Vault-Token: $ROOT_TOKEN" \
-                  -H "Content-Type: application/json" \
-                  -X POST \
-                  -d @payload.json \
-                  ${VAULT_ADDR}/v1/${VAULT_SECRET_MSP}
-
               fi;
 
               if [ "$COMPONENT_TYPE" = "orderer" ]; then
