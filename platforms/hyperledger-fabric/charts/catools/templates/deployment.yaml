@@ -444,6 +444,12 @@ spec:
               }
               
               echo "testing new container"
+
+              while ! [ -f /${MOUNT_PATH}/flag_finish.txt ]
+              do
+                echo 'Cemento Fresco, no hay letrero más bello… bueno, sólo Alto Voltaje.'
+                sleep 5s
+              done
               if [ -e /${MOUNT_PATH}/flag_finish.txt ]; then
                   echo "exits"
               fi;
