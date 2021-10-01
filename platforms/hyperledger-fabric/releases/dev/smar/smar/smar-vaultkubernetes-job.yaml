@@ -1,0 +1,38 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: smar-vaultkubenertes-job
+  namespace: smar-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: smar-vaultkubenertes-job
+  chart:
+    git: https://github.com/mgCepeda/blockchain-automation-framework.git
+    ref: feature-1574
+    path: platforms/hyperledger-fabric/charts/vault_kubernetes
+  values:
+    metadata:
+      name: smar
+      component_name: smar-net
+      component_type: orderer
+      namespace: smar-net    
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.2
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+
+    checks:
+      vault_auth_status_exits: False
+      vault_policy_not_exits: True
+
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: marsmar-net-auth
+      policy: vault-crypto-orderer-smar-net-ro
+      secret_path: secretsv2
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+    
+    k8s:
+      kubernetes_url: https://C8FA1454BFC54EBEAC7D6A70501769F2.sk1.eu-west-1.eks.amazonaws.com
