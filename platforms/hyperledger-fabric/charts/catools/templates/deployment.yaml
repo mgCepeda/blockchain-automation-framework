@@ -451,7 +451,10 @@ spec:
               }
               
               echo "testing new container"
-              ls /flag
+              if [ -e /flag/finish_flag4.txt ]; then
+                  echo "exits"
+              fi;
+
               tail -f /dev/null
           volumeMounts:
           - name: ca-tools-pv
