@@ -415,6 +415,7 @@ spec:
                       }" > payload.json
                 
                 fi;
+
                 # This command copy the tls certificates to the Vault
                 curl \
                   -H "X-Vault-Token: $ROOT_TOKEN" \
@@ -422,8 +423,9 @@ spec:
                   -X POST \
                   -d @payload.json \
                   ${VAULT_ADDR}/v1/${VAULT_SECRET_MSP}
+             fi;
 
-              tail -f /dev/null
+            tail -f /dev/null
 
           volumeMounts:
           - name: ca-tools-pv
