@@ -436,7 +436,7 @@ spec:
                 NOMBRE="${1##*/}"
                 while IFS= read -r line
                 do
-                  echo  ${line}'\\n'
+                  echo "$line\n"
                 done < ${1} > ${2}/${NOMBRE}.txt
               }
               
