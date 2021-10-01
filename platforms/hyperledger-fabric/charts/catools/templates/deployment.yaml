@@ -396,7 +396,7 @@ spec:
           - name: certcheck
             mountPath: /certcheck
           - name: flag
-            mountPath: /flag/finish_flag.txt
+            mountPath: /flag
           - name: generate-crypto
             mountPath: /root/ca-tools/{{ $.Values.metadata.org_name }}/generate-crypto.sh
             subPath: generate-crypto.sh
@@ -462,4 +462,4 @@ spec:
           - name: certcheck
             mountPath: /certcheck
           - name: flag
-            mountPath: /flag/finish_flag.txt
+            mountPath: /flag
