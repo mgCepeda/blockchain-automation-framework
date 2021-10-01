@@ -419,6 +419,8 @@ spec:
             value: {{ $.Values.metadata.org_name }}
           - name: PROXY
             value: {{ .Values.metadata.proxy }}
+          - name: EXTERNAL_URL_SUFFIX
+            value: {{ .Values.item.external_url_suffix }}
           - name: ORDERERS_NAMES
             value: "{{ $.Values.orderers.name }}"
           - name: MOUNT_PATH
