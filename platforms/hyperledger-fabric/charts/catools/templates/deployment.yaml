@@ -203,7 +203,6 @@ spec:
                   done
 
               fi;
-              touch ${MOUNT_PATH}/finish_flag3.txt
           volumeMounts:
           - name: ca-tools-pv
             mountPath: /root/ca-tools
@@ -390,8 +389,8 @@ spec:
               touch ${MOUNT_PATH}/finish_flag2.txt
               ls ${MOUNT_PATH}
               echo "+++++++++++++++++++++++++++"
-              mkdir -p ${FLAG_PATH}/finish_flag4.txt
-              ls ${FLAG_PATH}
+              touch /crypto-config/finish_flag3.txt
+              ls /crypto-config
               echo "+++++++++++++++++++++++++++"
               tail -f /dev/null
           volumeMounts:
@@ -459,7 +458,7 @@ spec:
               
               echo "testing new container"
               ls /certcheck
-              ls /flag
+              ls /crypto-config
               tail -f /dev/null
           volumeMounts:
           - name: ca-tools-pv
