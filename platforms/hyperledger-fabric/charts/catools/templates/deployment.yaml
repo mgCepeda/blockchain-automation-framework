@@ -464,7 +464,7 @@ spec:
                 CLIENT_CRT=$(cat ${FORMAT_CERTIFICATE_PATH}/tls/client.crt.txt)
                 CLIENT_KEY=$(cat ${FORMAT_CERTIFICATE_PATH}/tls/client.key.txt)
 
-                echo "*********************${CA_CRT}***********"
+                echo "*********************${CA_CRT}*******.......****"
                 echo 
                 echo "*********************${CLIENT_CRT}***********"
                 echo 
