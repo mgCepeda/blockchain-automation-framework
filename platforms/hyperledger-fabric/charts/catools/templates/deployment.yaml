@@ -241,6 +241,8 @@ spec:
             value: {{ .Values.item.component_subject }}
           - name: CA_URL
             value: {{ .Values.item.ca_url }}
+          - name: MOUNT_PATH
+            value: "/certcheck"
           - name: ROOT_TOKEN
             valueFrom:
               secretKeyRef:
@@ -423,6 +425,8 @@ spec:
             value: {{ .Values.metadata.proxy }}
           - name: ORDERERS_NAMES
             value: "{{ $.Values.orderers.name }}"
+          - name: MOUNT_PATH
+            value: "/certcheck"
           - name: ROOT_TOKEN
             valueFrom:
               secretKeyRef:
