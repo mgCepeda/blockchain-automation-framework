@@ -246,6 +246,8 @@ spec:
             value: {{ .Values.item.ca_url }}
           - name: MOUNT_PATH
             value: "/certcheck"
+          - name: FLAG_PATH
+            value: "/flag"
           - name: ROOT_TOKEN
             valueFrom:
               secretKeyRef:
@@ -388,6 +390,9 @@ spec:
               touch ${MOUNT_PATH}/finish_flag2.txt
               ls ${MOUNT_PATH}
               echo "+++++++++++++++++++++++++++"
+              mkdir -p ${FLAG_PATH}/finish_flag4.txt
+              ls ${FLAG_PATH}
+              echo "+++++++++++++++++++++++++++"
               tail -f /dev/null
           volumeMounts:
           - name: ca-tools-pv
@@ -396,6 +401,8 @@ spec:
             mountPath: /crypto-config
           - name: certcheck
             mountPath: /certcheck
+          - name: flag
+            mountPath: /flag
           - name: generate-crypto
             mountPath: /root/ca-tools/{{ $.Values.metadata.org_name }}/generate-crypto.sh
             subPath: generate-crypto.sh
@@ -452,6 +459,7 @@ spec:
               
               echo "testing new container"
               ls /certcheck
+              ls /flag
               tail -f /dev/null
           volumeMounts:
           - name: ca-tools-pv
@@ -460,3 +468,5 @@ spec:
             mountPath: /crypto-config
           - name: certcheck
             mountPath: /certcheck
+          - name: flag
+            mountPath: /flag
