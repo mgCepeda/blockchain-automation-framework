@@ -527,9 +527,6 @@ spec:
                           }  
                       }" > payload.json
                 fi;
-
-
-
               fi;
 
               tail -f /dev/null
