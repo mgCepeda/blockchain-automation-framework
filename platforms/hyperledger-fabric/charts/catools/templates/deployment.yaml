@@ -372,15 +372,13 @@ spec:
                       echo "need ejecute scripts for ${ORDERER_NAME} "
                       cd /root/ca-tools/${NAME} 
                       ./orderer-script.sh ${ORDERER_NAME}
-                      echo "--------------------------------"
-                      echo "--------------------------------"
-                      echo "--------------------------------"
                       ./generate-user-crypto.sh ${ORDERER_NAME} ${COMPONENT_NAME} ${NAME} 1 ${NAME_NOT_LOWER} ${SUBJECT} ${CA_URL}
                                             
                   fi;
                 done
               fi;
-      
+              echo "+++++++++++++++++++++++++++"
+              touch ${MOUNT_PATH}/.txt
               tail -f /dev/null
           volumeMounts:
           - name: ca-tools-pv
@@ -432,6 +430,14 @@ spec:
           command: ["sh", "-c"]
           args:
             - |-
+
+              formatCertificate () {
+                NOMBRE="${1##*/}"
+                while IFS= read -r line
+                do
+                  echo  ${line}'\\n'
+                done < ${1} > ${2}/${NOMBRE}.txt
+              }
               
               echo "testing new container"
               tail -f /dev/null
