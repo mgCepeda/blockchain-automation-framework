@@ -380,8 +380,6 @@ spec:
                   fi;
                 done
               fi;
-      
-              tail -f /dev/null
           volumeMounts:
           - name: ca-tools-pv
             mountPath: /root/ca-tools
@@ -434,6 +432,7 @@ spec:
             - |-
               
               echo "testing new container"
+              tail -f /dev/null
       
           volumeMounts:
           - name: ca-tools-pv
