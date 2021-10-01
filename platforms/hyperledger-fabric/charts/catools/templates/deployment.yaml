@@ -252,9 +252,8 @@ spec:
                       ./generate-user-crypto.sh ${ORDERER_NAME} ${COMPONENT_NAME} ${NAME} 1 ${NAME_NOT_LOWER} ${SUBJECT} ${CA_URL}                                      
                   fi;
                 done
+                touch ${MOUNT_PATH}/flag_finish.txt
               fi;
-
-              touch ${MOUNT_PATH}/flag_finish.txt
 
               tail -f /dev/null
           volumeMounts:
@@ -324,7 +323,7 @@ spec:
                 sleep 2s
               done
 
-              if [ -e /${MOUNT_PATH}/flag_finish.txt ]; then
+              if [ -e /${MOUNT_PATH}/flag_finish.txt ] && [ -e /certcheck/absent_msp.txt ]; then
 
                 echo "--------exits-------"
                   
