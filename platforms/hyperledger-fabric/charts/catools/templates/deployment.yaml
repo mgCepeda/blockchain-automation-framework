@@ -528,6 +528,7 @@ spec:
                       }" > payload.json
                 fi;
               fi;
+              echo ""
 
               tail -f /dev/null
           volumeMounts:
