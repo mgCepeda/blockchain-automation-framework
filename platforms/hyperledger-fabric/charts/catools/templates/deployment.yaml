@@ -476,11 +476,11 @@ spec:
 
                 rm payload.json
 
-                SK_NAME=$(find ${ORG_CYPTO_FOLDER_MSP}/keystore/ -name "*_sk")
+                SK_NAME=$(find ${ORG_CYPTO_FOLDER}/msp/keystore/ -name "*_sk")
   
-                formatCertificate "${ORG_CYPTO_FOLDER_MSP}/admincerts/Admin@${COMPONENT_NAME}-cert.pem" "${FORMAT_CERTIFICATE_PATH}/msp"
+                formatCertificate "${ORG_CYPTO_FOLDER}/msp/admincerts/Admin@${COMPONENT_NAME}-cert.pem" "${FORMAT_CERTIFICATE_PATH}/msp"
                 formatCertificate "${SK_NAME}" "${FORMAT_CERTIFICATE_PATH}/msp"
-                formatCertificate "${ORG_CYPTO_FOLDER_MSP}/signcerts/cert.pem" "${FORMAT_CERTIFICATE_PATH}/msp"
+                formatCertificate "${ORG_CYPTO_FOLDER}/msp/signcerts/cert.pem" "${FORMAT_CERTIFICATE_PATH}/msp"
 
                 ADMINCERTS=$(cat ${FORMAT_CERTIFICATE_PATH}/msp/Admin@${COMPONENT_NAME}-cert.pem.txt)
                 KEYSTORE=$(cat ${FORMAT_CERTIFICATE_PATH}/msp/*_sk.txt)
@@ -492,6 +492,7 @@ spec:
                 echo
                 echo "+++++++++++++++++++++${SIGNCERTS}+++++++++++++++++++++++"
                 echo
+
               fi;
 
               tail -f /dev/null
