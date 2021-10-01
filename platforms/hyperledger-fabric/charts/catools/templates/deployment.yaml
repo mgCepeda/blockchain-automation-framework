@@ -41,6 +41,9 @@ spec:
       - name: certcheck
         emptyDir:
           medium: Memory
+      - name: flag
+        emptyDir:
+          medium: Memory
       - name: generate-crypto
         configMap:
           name: orderers-script-cm
