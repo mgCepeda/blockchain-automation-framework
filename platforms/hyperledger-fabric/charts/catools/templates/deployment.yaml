@@ -432,8 +432,7 @@ spec:
             - |-
               
               echo "testing new container"
-              tail -f /dev/null
-      
+    
           volumeMounts:
           - name: ca-tools-pv
             mountPath: /root/ca-tools
