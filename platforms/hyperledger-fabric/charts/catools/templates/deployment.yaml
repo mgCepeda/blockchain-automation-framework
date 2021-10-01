@@ -463,6 +463,7 @@ spec:
                 CA_CRT=$(cat ${FORMAT_CERTIFICATE_PATH}/tls/ca.crt.txt)
                 CLIENT_CRT=$(cat ${FORMAT_CERTIFICATE_PATH}/tls/client.crt.txt)
                 CLIENT_KEY=$(cat ${FORMAT_CERTIFICATE_PATH}/tls/client.key.txt)
+                
                 echo "
                   {
                     \"data\": 
@@ -473,9 +474,24 @@ spec:
                       }  
                   }" > payload.json
 
-                    echo "pppppppppppppppppppppppppppppppppp"
-                    cat payload.json
-                    echo "pppppppppppppppppppppppppppppppppppppppppp"
+                rm payload.json
+
+                SK_NAME=$(find ${ORG_CYPTO_FOLDER_MSP}/keystore/ -name "*_sk")
+  
+                formatCertificate "${ORG_CYPTO_FOLDER_MSP}/admincerts/Admin@${COMPONENT_NAME}-cert.pem" "${FORMAT_CERTIFICATE_PATH}/msp"
+                formatCertificate "${SK_NAME}" "${FORMAT_CERTIFICATE_PATH}/msp"
+                formatCertificate "${ORG_CYPTO_FOLDER_MSP}/signcerts/cert.pem" "${FORMAT_CERTIFICATE_PATH}/msp"
+
+                ADMINCERTS=$(cat ${FORMAT_CERTIFICATE_PATH}/msp/Admin@${COMPONENT_NAME}-cert.pem.txt)
+                KEYSTORE=$(cat ${FORMAT_CERTIFICATE_PATH}/msp/*_sk.txt)
+                SIGNCERTS=$(cat ${FORMAT_CERTIFICATE_PATH}/msp/cert.pem.txt)
+
+                echo "+++++++++++++++++++++${ADMINCERTS}+++++++++++++++++++++++"
+                echo
+                echo "+++++++++++++++++++++${KEYSTORE}+++++++++++++++++++++++"
+                echo
+                echo "+++++++++++++++++++++${SIGNCERTS}+++++++++++++++++++++++"
+                echo
               fi;
 
               tail -f /dev/null
