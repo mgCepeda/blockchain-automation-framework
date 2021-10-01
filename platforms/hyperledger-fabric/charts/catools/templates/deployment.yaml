@@ -398,3 +398,47 @@ spec:
           - name: generate-user-crypto
             mountPath: /root/ca-tools/{{ $.Values.metadata.org_name }}/generate-user-crypto.sh
             subPath: generate-user-crypto.sh
+        - name: store-vault
+          image: {{ $.Values.initimage.alpineutils }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          - name: VAULT_ADDR
+            value: {{ $.Values.vault.address }}
+          - name: VAULT_APP_ROLE
+            value: {{ $.Values.vault.role }}
+          - name: KUBERNETES_AUTH_PATH
+            value: {{ $.Values.vault.authpath }}
+          - name: VAULT_SECRET_MSP
+            value: {{ $.Values.vault.secretmsp }}
+          - name: VAULT_SECRET_TLS
+            value: {{ $.Values.vault.secrettls }}
+          - name: VAULT_SECRET_ORDERER
+            value: {{ $.Values.vault.secretorderer }}
+          - name: COMPONENT_TYPE
+            value: {{ $.Values.metadata.component_type }}
+          - name: COMPONENT_NAME
+            value: {{ $.Values.metadata.namespace }}
+          - name: NAME
+            value: {{ $.Values.metadata.org_name }}
+          - name: PROXY
+            value: {{ .Values.metadata.proxy }}
+          - name: ORDERERS_NAMES
+            value: "{{ $.Values.orderers.name }}"
+          - name: ROOT_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: roottoken
+                key: token
+          command: ["sh", "-c"]
+          args:
+            - |-
+              
+              echo "testing new container"
+      
+          volumeMounts:
+          - name: ca-tools-pv
+            mountPath: /root/ca-tools
+          - name: ca-tools-crypto-pv
+            mountPath: /crypto-config
+          - name: certcheck
+            mountPath: /certcheck
