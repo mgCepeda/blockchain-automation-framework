@@ -378,7 +378,7 @@ spec:
                 done
               fi;
               echo "+++++++++++++++++++++++++++"
-              touch ${MOUNT_PATH}/.txt
+              touch ${MOUNT_PATH}/finish_flag.txt
               tail -f /dev/null
           volumeMounts:
           - name: ca-tools-pv
@@ -440,6 +440,7 @@ spec:
               }
               
               echo "testing new container"
+              ls /certcheck
               tail -f /dev/null
           volumeMounts:
           - name: ca-tools-pv
