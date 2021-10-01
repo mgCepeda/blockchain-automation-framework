@@ -378,14 +378,13 @@ spec:
                       echo "need ejecute scripts for ${ORDERER_NAME} "
                       cd /root/ca-tools/${NAME} 
                       ./orderer-script.sh ${ORDERER_NAME}
-                      ./generate-user-crypto.sh ${ORDERER_NAME} ${COMPONENT_NAME} ${NAME} 1 ${NAME_NOT_LOWER} ${SUBJECT} ${CA_URL}
-                                            
+                      ./generate-user-crypto.sh ${ORDERER_NAME} ${COMPONENT_NAME} ${NAME} 1 ${NAME_NOT_LOWER} ${SUBJECT} ${CA_URL}                                      
                   fi;
                 done
               fi;
               echo "+++++++++++++++++++++++++++"
               mkdir -p ${FLAG_PATH}/finish_flag4.txt
-              ls /FLAG_PATH
+              ls  ${FLAG_PATH}
               echo "+++++++++++++++++++++++++++++++++++"
               tail -f /dev/null
           volumeMounts:
