@@ -1,0 +1,32 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: org-net-ca-tools
+  namespace: org-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: org-net-ca-tools
+  chart:
+    git: https://github.com/mgCepeda/blockchain-automation-framework.git
+    ref: fabric-email
+    path: platforms/hyperledger-fabric/charts/catools
+  values:
+    metadata:
+      namespace: org-net
+      name: ca-tools
+    annotations:  
+      service:
+        - beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+      pvc:
+      deployment:
+    replicaCount: 1
+
+    image:
+      repository: hyperledger/fabric-ca-tools
+      tag: 1.2.1
+      pullPolicy: IfNotPresent
+      
+    storage:
+      storageclassname: orgsc
+      storagesize: 512Mi
