@@ -1,0 +1,33 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: orderer-ca-server-job
+  namespace: orderer-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: orderer-ca-server-job
+  chart:
+    git: https://github.com/mgCepeda/blockchain-automation-framework.git
+    ref: fabric-email
+    path: platforms/hyperledger-fabric/charts/ca_server
+  values:
+    metadata:
+      name: orderer
+      component_name: orderer-net
+      namespace: orderer-net    
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.0
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: demoorderer-net-auth
+      secretcryptoprefix: secretsv2/data/crypto/ordererOrganizations/orderer-net/ca
+      secretcredentialsprefix: secretsv2/data/credentials/orderer-net/ca/orderer
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      
+    ca:
+      subject: /C=HK/ST=Hong Kong/L=Hong Kong/O=Orderer/CN=ca.orderer-net.hf.dev2.aws.blockchaincloudpoc-develop.com
