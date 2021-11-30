@@ -1,0 +1,38 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: peer0-cmar-cli
+  namespace: cmar-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: peer0-cmar-cli
+  chart:
+    git: https://github.com/mgCepeda/blockchain-automation-framework.git
+    ref: fabric-email
+    path: platforms/hyperledger-fabric/charts/fabric_cli    
+  values:
+    metadata:
+      namespace: cmar-net
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.2
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+    storage:
+      class: cmarsc
+      size: 256Mi
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: marcmar-net-auth
+      adminsecretprefix: secretsv2/data/crypto/peerOrganizations/cmar-net/users/admin
+      orderersecretprefix: secretsv2/data/crypto/peerOrganizations/cmar-net/orderer
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      tls: false
+    peer:
+      name: peer0
+      localmspid: cmarMSP
+      tlsstatus: true
+      address: peer0.cmar-net.hf.dev2.aws.blockchaincloudpoc-develop.com:8443
+    orderer:
+      address: orderer1.hf.dev2.aws.blockchaincloudpoc-develop.com:8443
