@@ -1,0 +1,38 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: peer1-org-cli
+  namespace: org-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: peer1-org-cli
+  chart:
+    git: https://github.com/mgCepeda/blockchain-automation-framework.git
+    ref: fabric-email
+    path: platforms/hyperledger-fabric/charts/fabric_cli    
+  values:
+    metadata:
+      namespace: org-net
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.0
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+    storage:
+      class: orgsc
+      size: 256Mi
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: demoorg-net-auth
+      adminsecretprefix: secretsv2/data/crypto/peerOrganizations/org-net/users/admin
+      orderersecretprefix: secretsv2/data/crypto/peerOrganizations/org-net/orderer
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      tls: false
+    peer:
+      name: peer1
+      localmspid: orgMSP
+      tlsstatus: true
+      address: peer1.org-net.hf.dev2.aws.blockchaincloudpoc-develop.com:8443
+    orderer:
+      address: orderer4.hf.dev2.aws.blockchaincloudpoc-develop.com:8443
