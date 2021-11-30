@@ -1,11 +1,11 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: commitchaincode-{{ $.Values.chaincode.name }}-{{ $.Values.chaincode.version }}-{{ .Values.chaincode.sequence }}
+  name: commitchaincode-{{ $.Values.chaincode.name }}-{{ $.Values.chaincode.version }}-{{ .Values.chaincode.sequence }}-{{ .Values.peer.name }}
   namespace: {{ $.Values.metadata.namespace }}
   labels:
-    app: commitchaincode-{{ $.Values.chaincode.name }}-{{ $.Values.chaincode.version }}-{{ .Values.chaincode.sequence }}
-    app.kubernetes.io/name: commitchaincode-{{ $.Values.chaincode.name }}-{{ .Values.chaincode.sequence }}
+    app: commitchaincode-{{ $.Values.chaincode.name }}-{{ $.Values.chaincode.version }}-{{ .Values.chaincode.sequence }}-{{ .Values.peer.name }}
+    app.kubernetes.io/name: commitchaincode-{{ $.Values.chaincode.name }}-{{ .Values.chaincode.sequence }}-{{ .Values.peer.name }}
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/instance: {{ .Release.Name }}
