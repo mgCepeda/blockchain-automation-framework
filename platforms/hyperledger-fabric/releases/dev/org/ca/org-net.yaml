@@ -1,0 +1,51 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: org-net-ca
+  namespace: org-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: org-net-ca
+  chart:
+    git: https://github.com/mgCepeda/blockchain-automation-framework.git
+    ref: fabric-email
+    path: platforms/hyperledger-fabric/charts/ca    
+  values:
+    metadata:
+      namespace: org-net
+      images:
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+        ca: hyperledger/fabric-ca:1.4.8
+    deployment:
+      annotations:
+    annotations:  
+      service:
+        - beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+      pvc:
+       
+    server:
+      name: ca
+      tlsstatus: true
+      admin: org-admin
+    storage:
+      storageclassname: orgsc
+      storagesize: 512Mi
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: demoorg-net-auth
+      secretcert: secretsv2/data/crypto/peerOrganizations/org-net/ca?ca.org-net-cert.pem
+      secretkey: secretsv2/data/crypto/peerOrganizations/org-net/ca?org-net-CA.key
+      secretadminpass: secretsv2/data/credentials/org-net/ca/org?user
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+    service:
+      servicetype: ClusterIP
+      ports:
+        tcp:
+          port: 7054
+    proxy:
+      provider: haproxy
+      type: peer
+      external_url_suffix: hf.dev2.aws.blockchaincloudpoc-develop.com
