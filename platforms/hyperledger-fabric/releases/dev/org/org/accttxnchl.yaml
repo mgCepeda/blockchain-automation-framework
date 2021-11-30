@@ -1,0 +1,50 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: channel-org-accttxnchl
+  namespace: org-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: channel-org-accttxnchl
+  chart:
+    git: https://github.com/mgCepeda/blockchain-automation-framework.git
+    ref: fabric-email
+    path: platforms/hyperledger-fabric/charts/create_channel   
+  values:
+    metadata:
+      namespace: org-net
+      network:
+        version 2.2.0
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.0
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+    peer:
+      name: peer0
+      address: peer0.org-net:7051
+      localmspid: orgMSP
+      loglevel: debug
+      tlsstatus: true
+
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: demoorg-net-auth
+      adminsecretprefix: secretsv2/data/crypto/peerOrganizations/org-net/users/admin
+      orderersecretprefix: secretsv2/data/crypto/peerOrganizations/org-net/orderer 
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+
+    channel:
+      name: accttxnchl
+    orderer:
+      address: orderer4.orderer-net:7050
+    channeltx: |-
+      CqcDChgKFggCGgYI+/GXjQYiCmFjY3R0eG5jaGwSigMKhwMKCmFjY3R0eG5jaGwSLRIbCgtBcHBs
+      aWNhdGlvbhIMEgoKBm9yZ01TUBIAGg4KCkNvbnNvcnRpdW0SABrJAhKdAgoLQXBwbGljYXRpb24S
+      jQIIARIKCgZvcmdNU1ASABokCgxDYXBhYmlsaXRpZXMSFBIKCggKBFYyXzASABoGQWRtaW5zIiIK
+      B1JlYWRlcnMSFxINCAMSCQoHUmVhZGVycxoGQWRtaW5zIiIKB1dyaXRlcnMSFxINCAMSCQoHV3Jp
+      dGVycxoGQWRtaW5zIiIKBkFkbWlucxIYEg4IAxIKCgZBZG1pbnMQAhoGQWRtaW5zIiwKC0VuZG9y
+      c2VtZW50Eh0SEwgDEg8KC0VuZG9yc2VtZW50EAIaBkFkbWlucyI1ChRMaWZlY3ljbGVFbmRvcnNl
+      bWVudBIdEhMIAxIPCgtFbmRvcnNlbWVudBACGgZBZG1pbnMqBkFkbWlucxonCgpDb25zb3J0aXVt
+      EhkSFwoVU3VwcGx5Q2hhaW5Db25zb3J0aXVt
