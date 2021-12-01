@@ -1,0 +1,49 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: anchorpeer-campaignchl-org
+  namespace: org-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: anchorpeer-campaignchl-org
+  chart:
+    git: https://github.com/mgCepeda/blockchain-automation-framework.git
+    ref: fabric-email
+    path: platforms/hyperledger-fabric/charts/anchorpeer
+  values:
+    metadata:
+      namespace: org-net
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.0
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+
+    peer:
+      name: peer0
+      address: peer0.org-net:7051
+      localmspid: orgMSP
+      loglevel: debug
+      tlsstatus: true
+
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: demoorg-net-auth
+      adminsecretprefix: secretsv2/data/crypto/peerOrganizations/org-net/users/admin
+      orderersecretprefix: secretsv2/data/crypto/peerOrganizations/org-net/orderer
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+
+    channel:
+      name: campaignchl      
+    orderer:
+      address: orderer4.orderer-net:7050
+    anchorstx: |-
+      CtkCChkKFwgCGgYIi/ucjQYiC2NhbXBhaWduY2hsErsCCrgCCgtjYW1wYWlnbmNobBJfEl0KC0Fw
+      cGxpY2F0aW9uEk4IARJKCgZvcmdNU1ASQBoHCgNNU1ASACILCgdSZWFkZXJzEgAiCwoHV3JpdGVy
+      cxIAIgoKBkFkbWlucxIAIg8KC0VuZG9yc2VtZW50EgAaxwESxAEKC0FwcGxpY2F0aW9uErQBCAES
+      rwEKBm9yZ01TUBKkAQgBGgcKA01TUBIAGlgKC0FuY2hvclBlZXJzEkkSPwo9CjhwZWVyMC5vcmct
+      bmV0LmhmLmRldjIuYXdzLmJsb2NrY2hhaW5jbG91ZHBvYy1kZXZlbG9wLmNvbRD7QRoGQWRtaW5z
+      IgsKB1JlYWRlcnMSACILCgdXcml0ZXJzEgAiCgoGQWRtaW5zEgAiDwoLRW5kb3JzZW1lbnQSACoG
+      QWRtaW5z
+
