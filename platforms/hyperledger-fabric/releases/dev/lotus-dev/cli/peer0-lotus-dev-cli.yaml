@@ -1,0 +1,38 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: peer0-lotus-dev-cli
+  namespace: lotus-dev-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: peer0-lotus-dev-cli
+  chart:
+    git: https://github.com/mgCepeda/blockchain-automation-framework.git
+    ref: fabric-email
+    path: platforms/hyperledger-fabric/charts/fabric_cli    
+  values:
+    metadata:
+      namespace: lotus-dev-net
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.2
+        alpineutils: docker.io/hyperledgerlabs/alpine-utils:1.0
+    storage:
+      class: lotus-devsc
+      size: 256Mi
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: devlotus-dev-net-auth
+      adminsecretprefix: secretsv2/data/crypto/peerOrganizations/lotus-dev-net/users/admin
+      orderersecretprefix: secretsv2/data/crypto/peerOrganizations/lotus-dev-net/orderer
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      tls: false
+    peer:
+      name: peer0
+      localmspid: lotus-devMSP
+      tlsstatus: true
+      address: peer0.lotus-dev-net.hf.dev2.aws.blockchaincloudpoc-develop.com:8443
+    orderer:
+      address: orderer1.hf.dev2.aws.blockchaincloudpoc-develop.com:8443
