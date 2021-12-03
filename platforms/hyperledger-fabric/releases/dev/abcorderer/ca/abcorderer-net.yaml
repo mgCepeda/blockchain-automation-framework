@@ -1,0 +1,44 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: abcorderer-net-ca
+  namespace: abcorderer-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: abcorderer-net-ca
+  chart:
+    git: https://github.com/mgCepeda/blockchain-automation-framework.git
+    ref: fabric-email
+    path: platforms/hyperledger-fabric/charts/ca    
+  values:
+    metadata:
+      namespace: abcorderer-net
+      images:
+        alpineutils: docker.io/hyperledgerlabs/alpine-utils:1.0
+        ca: hyperledger/fabric-ca:1.4.8
+    server:
+      name: ca
+      tlsstatus: true
+      admin: abcorderer-admin
+    storage:
+      storageclassname: abcorderersc
+      storagesize: 512Mi 
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: devabcorderer-net-auth
+      secretcert: secretsv2/data/crypto/ordererOrganizations/abcorderer-net/ca?ca.abcorderer-net-cert.pem
+      secretkey: secretsv2/data/crypto/ordererOrganizations/abcorderer-net/ca?abcorderer-net-CA.key
+      secretadminpass: secretsv2/data/credentials/abcorderer-net/ca/abcorderer?user
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+    service:
+      servicetype: ClusterIP
+      ports:
+        tcp:
+          port: 7054
+    proxy:
+      provider: haproxy
+      type: orderer
+      external_url_suffix: hf.dev2.aws.blockchaincloudpoc-develop.com
