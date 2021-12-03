@@ -1,0 +1,63 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: lotus-dev-peer0
+  namespace: lotus-dev-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: lotus-dev-peer0
+  chart:
+    git: https://github.com/mgCepeda/blockchain-automation-framework.git
+    ref: fabric-email
+    path: platforms/hyperledger-fabric/charts/peernode    
+  values:
+    metadata:
+      namespace: lotus-dev-net
+      images:
+        couchdb: couchdb:3.1
+        peer: hyperledger/fabric-peer:2.2.2
+        alpineutils: docker.io/hyperledgerlabs/alpine-utils:1.0
+        
+    peer:
+      name: peer0
+      gossippeeraddress: peer0.lotus-dev-net.hf.dev2.aws.blockchaincloudpoc-develop.com:8443
+      gossipexternalendpoint: peer0.lotus-dev-net.hf.dev2.aws.blockchaincloudpoc-develop.com:8443
+      localmspid: lotus-devMSP
+      loglevel: info
+      tlsstatus: true
+      builder: hyperledger/fabric-ccenv:2.2.2
+      couchdb:
+        username: lotus-dev-user
+
+    storage:
+      peer:
+        storageclassname: lotus-devsc
+        storagesize: 512Mi
+      couchdb:
+        storageclassname: lotus-devsc
+        storagesize: 1Gi
+
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: devlotus-dev-net-auth
+      secretprefix: secretsv2/data/crypto/peerOrganizations/lotus-dev-net/peers/peer0.lotus-dev-net
+      secretambassador: secretsv2/data/crypto/peerOrganizations/lotus-dev-net/ambassador
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      secretcouchdbpass: secretsv2/data/credentials/lotus-dev-net/couchdb/lotus-dev?user
+
+    service:
+      servicetype: ClusterIP
+      ports:
+        grpc:
+          clusteripport: 7051
+        events:
+          clusteripport: 7053
+        couchdb:
+          clusteripport: 5984
+          
+    proxy:
+      provider: "haproxy"
+      external_url_suffix: hf.dev2.aws.blockchaincloudpoc-develop.com
