@@ -1,0 +1,38 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: peer0-abc-dev-cli
+  namespace: abc-dev-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: peer0-abc-dev-cli
+  chart:
+    git: https://github.com/mgCepeda/blockchain-automation-framework.git
+    ref: fabric-email
+    path: platforms/hyperledger-fabric/charts/fabric_cli    
+  values:
+    metadata:
+      namespace: abc-dev-net
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.2
+        alpineutils: docker.io/hyperledgerlabs/alpine-utils:1.0
+    storage:
+      class: abc-devsc
+      size: 256Mi
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: devabc-dev-net-auth
+      adminsecretprefix: secretsv2/data/crypto/peerOrganizations/abc-dev-net/users/admin
+      orderersecretprefix: secretsv2/data/crypto/peerOrganizations/abc-dev-net/orderer
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      tls: false
+    peer:
+      name: peer0
+      localmspid: abc-devMSP
+      tlsstatus: true
+      address: peer0.abc-dev-net.hf.dev2.aws.blockchaincloudpoc-develop.com:8443
+    orderer:
+      address: orderer1.hf.dev2.aws.blockchaincloudpoc-develop.com:8443
