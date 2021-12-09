@@ -1,0 +1,49 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: commit-cmar-allchannel-supplychain1-1
+  namespace: cmar-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: commit-cmar-allchannel-supplychain1-1
+  chart:
+    git: https://github.com/mgCepeda/blockchain-automation-framework.git
+    ref: fabric-email
+    path: platforms/hyperledger-fabric/charts/commit_chaincode
+  values:
+    metadata:
+      namespace: cmar-net
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.2
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+    peer:
+      name: peer0
+      address: peer0.cmar-net:7051
+      localmspid: cmarMSP
+      loglevel: debug
+      tlsstatus: true
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: marcmar-net-auth
+      adminsecretprefix: secretsv2/data/crypto/peerOrganizations/cmar-net/users/admin
+      orderersecretprefix: secretsv2/data/crypto/peerOrganizations/cmar-net/orderer
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      tls: false
+    orderer:
+      address: orderer1.hf.dev2.aws.blockchaincloudpoc-develop.com:8443
+    chaincode:
+      builder: hyperledger/fabric-ccenv:2.2.2
+      name: supplychain
+      version: 1
+      sequence: 1
+      commitarguments: '\"init\",\"\"'
+      endorsementpolicies:  ''
+    channel:
+      name: allchannel
+    endorsers:
+      creator: cmar-net
+      name:  cmar  
+      corepeeraddress:  peer0.cmar-net.hf.dev2.aws.blockchaincloudpoc-develop.com:8443 
