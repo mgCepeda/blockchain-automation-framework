@@ -62,7 +62,7 @@ jobs:
       run: node -v
          
     - name: Build and push supplychain app latest
-      id: quorum_supplychain_latest
+      id: express_supplychain_latest
       uses: docker/build-push-action@v2
       with:
         context: examples/supplychain-app/fabric/express_nodeJs
@@ -70,7 +70,7 @@ jobs:
         tags: ${{ steps.image_path_format.outputs.lowercase }}/bevel-supplychain-fabric:express-app-latest
 
     - name: Build and push supplychain rest-server
-      id: fabric_supplychain_latest
+      id: restserver_supplychain_latest
       uses: docker/build-push-action@v2
       with:
         context: examples/supplychain-app/fabric/chaincode_rest_server/rest-server
