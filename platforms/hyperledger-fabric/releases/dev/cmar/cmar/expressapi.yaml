@@ -1,0 +1,35 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: cmar-expressapi
+  namespace: cmar-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  chart:
+    path: examples/supplychain-app/charts/expressapp
+    git: "https://github.com/mgCepeda/blockchain-automation-framework.git"
+    ref: "feature-1823"
+  releaseName: cmarfabric-expressapi
+  values:
+    nodeName: cmar-expressapi
+    metadata:
+      namespace: cmar-net
+    replicaCount: 1
+    expressapp:
+      serviceType: ClusterIP
+      image: index.docker.io/hyperledgerlabs/supplychain_fabric:express_app_latest
+      pullPolicy: Always
+      pullSecrets: regcred
+      nodePorts:
+        port: 3000
+        targetPort: 3000
+        name: tcp
+      env:
+        apiUrl: http://cmar-restserver.cmar-net:20001/api/v1
+    proxy:
+      provider: haproxy
+      name: cmar
+      type: fabric
+      external_url_suffix: hf.dev2.aws.blockchaincloudpoc-develop.com
+      peer_name: peer0
