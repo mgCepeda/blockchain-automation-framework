@@ -1,0 +1,35 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: cmar-frontend
+  namespace: cmar-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  chart:
+    path: examples/supplychain-app/charts/frontend
+    git: "https://github.com/mgCepeda/blockchain-automation-framework.git"
+    ref: "feature-1823"
+  releaseName: cmarfabric-frontend
+  values:
+    nodeName: cmar-frontend
+    metadata:
+      namespace: cmar-net
+    replicaCount: 1
+    frontend:
+      serviceType: ClusterIP
+      nodePorts:
+        port: 8080
+        targetPort: 80
+      image: index.docker.io/hyperledgerlabs/supplychain_frontend:latest
+      pullPolicy: Always
+      pullSecrets: regcred
+      env:
+        webserver: https://cmarapi.hf.dev2.aws.blockchaincloudpoc-develop.com
+    deployment:
+      annotations: {}
+    proxy:
+      provider: haproxy
+      peer_name: cmar
+      external_url_suffix: hf.dev2.aws.blockchaincloudpoc-develop.com
+      ambassador_secret: peer0-cmar-net-ambassador-certs
