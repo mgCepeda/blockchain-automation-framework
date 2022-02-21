@@ -1,0 +1,46 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: cmar-restserver
+  namespace: cmar-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  chart:
+    path: examples/supplychain-app/charts/fabric-restserver
+    git: https://github.com/mgCepeda/blockchain-automation-framework.git
+    ref: feature-1823
+  releaseName: cmar-restserver
+  values:
+    metadata:
+      namespace: cmar-net
+    server:
+      name: cmar-restserver
+      port: 20001
+      localmspid: cmarMSP
+      image: ghcr.io/mgcepeda/bevel-supplychain-fabric:rest-server-latest
+      username: user1
+      cert_path: "/secret/tls/user1.cert"
+      key_path: "/secret/tls/user1.pem"
+    storage:
+      storageclassname: cmarsc
+      storagesize: 512Mi
+    vault:
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      role: vault-role
+      authpath: marcmar-net-auth
+      secretprefix: secretsv2/data/crypto/peerOrganizations/cmar-net
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      image: hyperledgerlabs/alpine-utils:1.0
+    service:
+      servicetype: ClusterIP
+      ports:
+        apiPort: 20001
+        targetPort: 8000
+    connection:
+      peer: peer0.cmar-net
+      peerAddress: peer0.cmar-net
+      peerPort: 7051
+      ordererAddress: orderer7.hf.dev2.aws.blockchaincloudpoc-develop.com
+      ordererPort: 8443
