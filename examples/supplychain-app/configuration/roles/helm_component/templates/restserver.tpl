@@ -32,7 +32,7 @@ spec:
       secretprefix: {{ component_vault.secret_path | default('secretsv2') }}/data/crypto/peerOrganizations/{{ component_ns }}
       serviceaccountname: vault-auth
       imagesecretname: regcred
-      image: hyperledgerlabs/alpine-utils:1.0
+      image: ghcr.io/hyperledger/alpine-utils:1.0
     service:
       servicetype: ClusterIP
       ports:
