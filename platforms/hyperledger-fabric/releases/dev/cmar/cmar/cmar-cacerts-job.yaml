@@ -1,0 +1,33 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: cmar-cacerts-job
+  namespace: cmar-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: cmar-cacerts-job
+  chart:
+    git: https://github.com/mgCepeda/blockchain-automation-framework.git
+    ref: feature-1823
+    path: platforms/hyperledger-fabric/charts/generate_cacerts
+  values:
+    metadata:
+      name: cmar
+      component_name: cmar-net
+      namespace: cmar-net    
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.2
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: marcmar-net-auth
+      secretcryptoprefix: secretsv2/data/crypto/peerOrganizations/cmar-net/ca
+      secretcredentialsprefix: secretsv2/data/credentials/cmar-net/ca/cmar
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      
+    ca:
+      subject: /C=GB/ST=London/L=London/O=Carrier/CN=ca.cmar-net
