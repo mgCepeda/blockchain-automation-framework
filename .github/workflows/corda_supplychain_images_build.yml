@@ -49,14 +49,16 @@ jobs:
         WDIR=`pwd`
         
         java -version
-        update-alternatives --list java
-
-        echo "---- building networkmap ----"
+             
         cd ${WDIR}/examples/supplychain-app/corda/cordApps_springBoot
-        ls
+        
+        ./gradlew deployWebapps
+
+        echo "---- finish ----"
+        ls build/webapps
         echo "---- finish ----"
 
-    - run: pwd
+
     
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
