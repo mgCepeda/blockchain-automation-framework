@@ -31,9 +31,9 @@ network:
   # Please ensure all required images are built and stored in this registry. 
   # Do not check-in docker_password.
   docker:
-    url: "docker_url"
-    username: "docker_username"
-    password: "docker_password"
+    url: "ghcr.io/hyperledger"
+    # username: "docker_username"
+    # password: "docker_password"
   
   # Remote connection information for orderer (will be blank or removed for hosting organization)
   orderers:
