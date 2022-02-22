@@ -18,7 +18,7 @@ spec:
       name: {{ name }}-restserver
       port: {{ peer_restserver_port }}
       localmspid: {{ name }}MSP
-      image: ghcr.io/mgcepeda/bevel-supplychain-fabric:rest-server-latest
+      image: {{ network.docker.url }}/bevel-supplychain-fabric:rest-server-latest
       username: user1
       cert_path: "/secret/tls/user1.cert"
       key_path: "/secret/tls/user1.pem"
