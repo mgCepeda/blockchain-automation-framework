@@ -44,6 +44,8 @@ jobs:
         distribution: 'adopt'
         java-version: '8'
     
+    - run: cd examples/supplychain-app/corda/cordApps_springBoot
+    
     - run: pwd
     
     - name: Set up Docker Buildx
