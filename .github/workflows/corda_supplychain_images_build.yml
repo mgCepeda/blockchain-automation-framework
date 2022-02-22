@@ -44,11 +44,18 @@ jobs:
         distribution: 'adopt'
         java-version: '8'
     
-    - name: Run Tests
+    - name: Run Testss
       run: |
-        cd examples
-        ls
+        WDIR=`pwd`
         
+        java -version
+        update-alternatives --list java
+
+        echo "---- building networkmap ----"
+        cd ${WDIR}/examples/supplychain-app/corda/cordApps_springBoot
+        ls
+        echo "---- finish ----"
+
     - run: pwd
     
     - name: Set up Docker Buildx
