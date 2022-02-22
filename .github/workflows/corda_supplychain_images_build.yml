@@ -114,6 +114,8 @@ jobs:
 
         ./gradlew deployWebapps
 
+        ls build/webapps
+
     - name: Set output
       id: vars
       run: echo ::set-output name=tag::${GITHUB_REF#refs/tags/v}
