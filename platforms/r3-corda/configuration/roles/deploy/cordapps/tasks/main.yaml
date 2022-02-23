@@ -27,6 +27,9 @@
   loop_control:
     loop_var: jarfile
 
+- pause:
+    minutes: 120
+
 ##############################################################################################
 # This task run the shell script to upload cordapp jar files 
 # for each notary
