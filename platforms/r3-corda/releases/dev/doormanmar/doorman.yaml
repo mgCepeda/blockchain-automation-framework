@@ -1,0 +1,74 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: doormanmar
+  annotations:
+    fluxcd.io/automated: "false"
+  namespace: smar-ns
+spec:
+  releaseName: doormanmar
+  chart:
+    path: platforms/r3-corda/charts/doorman-tls
+    git: https://github.com/mgCepeda/blockchain-automation-framework.git
+    ref: feature-1823
+  values:
+    nodeName: doormanmar
+    metadata:
+      namespace: smar-ns
+    image:
+      authusername: sa
+      containerName: adopblockchaincloud0502.azurecr.io/doorman-linuxkit:latest
+      env:
+      - name: DOORMAN_PORT
+        value: 8080
+      - name: DOORMAN_ROOT_CA_NAME
+        value: CN=Corda Doorman CA,OU=DLT,O=DLT,L=Berlin,C=DE
+      - name: DOORMAN_TLS
+        value: true
+      - name: DOORMAN_DB
+        value: /opt/doorman/db
+      - name: DOORMAN_AUTH_USERNAME
+        value: sa
+      - name: DB_URL
+        value: mongodb-doormanmar
+      - name: DB_PORT
+        value: 27017
+      - name: DATABASE
+        value: admin
+      - name: DB_USERNAME
+        value: doormanmar
+      imagePullSecret: regcred
+      tlsCertificate: true
+      initContainerName: adopblockchaincloud0502.azurecr.io/alpine-utils:1.0
+      mountPath:
+        basePath: /opt/doorman
+    storage:
+      memory: 512Mi
+      name: awsstorageclass
+    mountPath:
+      basePath: /opt/doorman
+    vault:
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      role: vault-role
+      authpath: cordadoormanmar
+      serviceaccountname: vault-auth
+      certsecretprefix: doormanmar/data/certs
+      dbcredsecretprefix: doormanmar/data/credentials/mongodb
+      secretdoormanpass: doormanmar/data/credentials/userpassword
+      tlscertsecretprefix: doormanmar/data/tlscerts
+      dbcertsecretprefix: doormanmar/data/certs
+    healthcheck:
+      readinesscheckinterval: 10
+      readinessthreshold: 15
+      dburl: mongodb-doormanmar:27017
+    service:
+      port: 8080
+      targetPort: 8080
+      type: ClusterIP
+      annotations: {}
+    deployment:
+      annotations: {}
+    pvc:
+      annotations: {}
+    ambassador:
+      external_url_suffix: rc.dev2.aws.blockchaincloudpoc-develop.com
