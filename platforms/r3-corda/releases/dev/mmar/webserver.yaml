@@ -18,7 +18,7 @@ spec:
       namespace: mmar-ns
       type: cordaopensource
     image:
-      containerName: ghcr.io/mgCepeda/bevel-supplychain-corda:springboot-0.9.0.0
+      containerName: ghcr.io/mgcepeda/bevel-supplychain-corda:springboot-0.9.0.0
       initContainerName: ghcr.io/hyperledger/alpine-utils:1.0
       imagePullSecret: regcred
       privateCertificate: true
