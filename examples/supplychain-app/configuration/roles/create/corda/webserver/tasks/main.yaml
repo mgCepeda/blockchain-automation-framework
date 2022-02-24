@@ -29,7 +29,7 @@
     platform_type: "cordaopensource"
     name: "{{ node.name }}"
     charts_dir: "{{ organization_data.gitops.chart_source }}"
-    image_tag: "{{ springboot_image_tag[network.version] }}"
+    image_tag: "{{ springboot_image_tag_corda[network.version] }}"
     networkmap_name: na
     doorman_name: na
   loop: "{{ organization_data.services.peers }}"
@@ -47,7 +47,7 @@
     component_ns: "{{ organization_data.name | lower }}-ent"
     name: "{{ node.name }}"
     charts_dir: "{{ organization_data.gitops.chart_source }}"
-    image_tag: "{{ springboot_image_tag[network.version] }}"
+    image_tag: "{{ springboot_image_tag_corda_ent[network.version] }}"
     networkmap_name: "{{ network | json_query('network_services[?type==`networkmap`].name') | first }}"
     doorman_name: "{{ network | json_query('network_services[?type==`idman`].name') | first }}"
   loop: "{{ organization_data.services.peers }}"
