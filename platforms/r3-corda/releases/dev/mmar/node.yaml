@@ -1,0 +1,129 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: mmar
+  annotations:
+    fluxcd.io/automated: "false"
+  namespace: mmar-ns
+spec:
+  releaseName: mmar
+  chart:
+    path: platforms/r3-corda/charts/node
+    git: https://github.com/mgCepeda/blockchain-automation-framework.git
+    ref: feature-1823
+  values:
+    nodeName: mmar
+    replicas: 1
+    metadata:
+      namespace: mmar-ns
+    image:
+      containerName: adopblockchaincloud0502.azurecr.io/corda:4.7-linuxkit
+      initContainerName: adopblockchaincloud0502.azurecr.io/alpine-utils:1.0
+      imagePullSecret: regcred
+      privateCertificate: true
+      doormanCertAlias: doormanmar.rc.dev2.aws.blockchaincloudpoc-develop.com
+      networkmapCertAlias: networkmapmar.rc.dev2.aws.blockchaincloudpoc-develop.com
+    nodeConf:
+      p2p:
+        url: mmar.mmar-ns
+        port: 10002
+      ambassadorAddress: mmar.rc.dev2.aws.blockchaincloudpoc-develop.com:15010
+      rpcSettings:
+        useSsl: false
+        standAloneBroker: false
+        address: "0.0.0.0:10003"
+        adminAddress: "0.0.0.0:10005"
+        ssl:
+          certificatesDirectory: na-ssl-false
+          sslKeystorePath: na-ssl-false
+          trustStoreFilePath: na-ssl-false
+      legalName: O=Manufacturer,OU=Manufacturer,L=47.38/8.54/Zurich,C=CH #use peer-node level subject for legalName
+      messagingServerAddress:
+      jvmArgs:
+      systemProperties:
+      sshd:
+        port:
+      exportJMXTo:
+      transactionCacheSizeMegaBytes: 8
+      attachmentContentCacheSizeMegaBytes: 10
+      attachmentCacheBound: 1024
+       
+      detectPublicIp: false
+      database:
+        exportHibernateJMXStatistics: false
+      dbUrl: mmardb
+      dbPort: 9101
+      dataSourceClassName: "org.h2.jdbcx.JdbcDataSource"
+      dataSourceUrl: "jdbc:h2:tcp://mmardb:9101/persistence;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=10000;WRITE_DELAY=100;AUTO_RECONNECT=TRUE;"
+      jarPath: "/data/corda-workspace/h2/bin"
+      networkMapURL: https://networkmapmar.rc.dev2.aws.blockchaincloudpoc-develop.com
+      doormanURL: https://doormanmar.rc.dev2.aws.blockchaincloudpoc-develop.com
+      compatibilityZoneURL:
+      jarVersion: 4.7
+      devMode: false
+      env:
+        - name: JAVA_OPTIONS
+          value: -Xmx512m
+        - name: CORDA_HOME
+          value: /opt/corda
+        - name: BASE_DIR
+          value: /base/corda
+    credentials:
+      dataSourceUser: sa
+      rpcUser:
+        - name: mmaroperations
+          permissions: [ALL]
+
+    cordapps:
+      getcordapps: true
+      jars:
+        - url: https://alm.accenture.com/nexus/repository/AccentureBlockchainFulcrum_Release/com/supplychain/bcc/cordapp-supply-chain/4.7/cordapp-supply-chain-4.7.jar
+        - url: https://alm.accenture.com/nexus/repository/AccentureBlockchainFulcrum_Release/com/supplychain/bcc/cordapp-contracts-states/4.7/cordapp-contracts-states-4.7.jar
+        
+    volume:
+      baseDir: /base/corda
+    resources:
+      limits: "1Gi"
+      requests: "1Gi" 
+    pvc:
+      name: mmar-pvc
+      annotations: {}
+      memory: 512Mi
+      storageClassName: awsstorageclass
+
+    service:
+      name: mmar
+      type: ClusterIP
+      p2p:
+        port: 10002
+        targetPort: 10002
+      rpc:
+        port: 10003
+        targetPort: 10003 
+      rpcadmin:
+        port: 10005
+        targetPort: 10005
+         
+    deployment:
+      annotations: {}
+    vault:
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      role: vault-role
+      authpath: cordammar
+      serviceaccountname: vault-auth
+      dbsecretprefix: mmar/data/credentials/database
+      rpcusersecretprefix: mmar/data/credentials/rpcusers
+      keystoresecretprefix: mmar/data/credentials/keystore
+      certsecretprefix: mmar/data/certs
+      networkmapsecretprefix: mmar/data/credentials/networkmappassword
+      cordappsreposecretprefix: mmar/data/credentials/cordapps
+      retries: 10
+
+          
+    healthcheck:
+      readinesscheckinterval: 20
+      readinessthreshold: 20
+    ambassador:
+      component_name: mmar
+      external_url_suffix: rc.dev2.aws.blockchaincloudpoc-develop.com
+      p2p_ambassador: 15010
