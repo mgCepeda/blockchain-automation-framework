@@ -18,7 +18,11 @@ spec:
     replicaCount: 1
     expressapp:
       serviceType: ClusterIP
+{% if  network.type == 'corda' %}
+      image: {{ network.container_registry.url | lower }}/{{ expressapi_image }}
+{% else %}
       image: {{ network.docker.url }}/{{ expressapi_image }}
+{% endif %}
       pullPolicy: Always
       pullSecrets: regcred
       nodePorts:
