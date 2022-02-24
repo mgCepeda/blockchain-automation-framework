@@ -21,7 +21,11 @@ spec:
       nodePorts:
         port: {{ peer_frontend_port }}
         targetPort: {{ peer_frontend_targetport }}
-      image: {{ network.docker.url | lower }}/bevel-supplychain-frontend:latest
+{% if  network.type == 'corda' or network.type == 'fabric' %}
+      image: {{ network.container_registry.url | lower }}/bevel-supplychain-frontend:latest
+{% else %}
+       image: {{ network.docker.url }}/supplychain_frontend:latest
+{% endif %}
       pullPolicy: Always
       pullSecrets: regcred
       env:
