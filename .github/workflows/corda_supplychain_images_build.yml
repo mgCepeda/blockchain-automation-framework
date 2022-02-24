@@ -80,7 +80,7 @@ jobs:
       with:
         context: examples/supplychain-app/corda/express_nodeJS
         push: true
-        tags: ${{ steps.image_path_format.outputs.lowercase }}/bevel-supplychain-corda:express_app_latest,${{ steps.image_path_format.outputs.lowercase }}/bevel-supplychain-corda:express_app_${{ env.VERSION }}
+        tags: ${{ steps.image_path_format.outputs.lowercase }}/bevel-supplychain-corda:express-app-latest,${{ steps.image_path_format.outputs.lowercase }}/bevel-supplychain-corda:express-app-${{ env.VERSION }}
 
     - name: Build and push supplychain springboot
       id: corda_springboot_latest
@@ -88,7 +88,7 @@ jobs:
       with:
         context: examples/supplychain-app/corda/cordApps_springBoot
         push: true
-        tags: ${{ steps.image_path_format.outputs.lowercase }}/bevel-supplychain-corda:springboot_latest,${{ steps.image_path_format.outputs.lowercase }}/bevel-supplychain-corda:springboot_${{ env.VERSION }}
+        tags: ${{ steps.image_path_format.outputs.lowercase }}/bevel-supplychain-corda:springboot-latest,${{ steps.image_path_format.outputs.lowercase }}/bevel-supplychain-corda:springboot-${{ env.VERSION }}
        
 
   corda-release: 
@@ -147,7 +147,7 @@ jobs:
       with:
         context: examples/supplychain-app/corda/express_nodeJS
         push: true
-        tags: ${{ steps.image_path_format.outputs.lowercase }}/bevel-supplychain-corda:express_app_${{ steps.vars.outputs.tag }},${{ steps.image_path_format.outputs.lowercase }}/bevel-supplychain-corda:express_app_stable
+        tags: ${{ steps.image_path_format.outputs.lowercase }}/bevel-supplychain-corda:express-app-${{ steps.vars.outputs.tag }},${{ steps.image_path_format.outputs.lowercase }}/bevel-supplychain-corda:express-app-stable
     
     - name: Build and push supplychain springboot
       id: corda_springboot_release
@@ -155,4 +155,4 @@ jobs:
       with:
         context: examples/supplychain-app/corda/cordApps_springBoot
         push: true
-        tags: ${{ steps.image_path_format.outputs.lowercase }}/bevel-supplychain-corda:springboot_${{ steps.vars.outputs.tag }},${{ steps.image_path_format.outputs.lowercase }}/bevel-supplychain-corda:springboot_stable
+        tags: ${{ steps.image_path_format.outputs.lowercase }}/bevel-supplychain-corda:springboot-${{ steps.vars.outputs.tag }},${{ steps.image_path_format.outputs.lowercase }}/bevel-supplychain-corda:springboot-stable
