@@ -1,0 +1,33 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: cmar-vaultk8s-job
+  namespace: cmar-bes
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: cmar-vaultk8s-job
+  chart:
+    git: https://github.com/mgCepeda/blockchain-automation-framework.git
+    ref: testbesu
+    path: platforms/shared/charts/vault-k8s-mgmt
+  values:
+    metadata:
+      name: cmar-vaultk8s-job
+      namespace: cmar-bes    
+      images:
+        alpineutils: hyperledgerlabs/alpine-utils:1.0
+
+    vault:
+      reviewer_service: vault-reviewer
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: besucmar
+      policy: vault-crypto-organization-cmar-ro
+      policydata: "{\n  \"policy\": \"path \\\"secretsv2/data/cmar-bes/crypto/*\\\" {\n    capabilities = [\\\"read\\\", \\\"list\\\", \\\"create\\\", \\\"update\\\"]\n  }\n  path \\\"secretsv2/data/cmar-bes/smartContracts/*\\\" {\n    capabilities = [\\\"read\\\", \\\"list\\\"]\n  }\"\n}"
+      secret_path: secretsv2
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+    
+    k8s:
+      kubernetes_url: https://C8FA1454BFC54EBEAC7D6A70501769F2.sk1.eu-west-1.eks.amazonaws.com
