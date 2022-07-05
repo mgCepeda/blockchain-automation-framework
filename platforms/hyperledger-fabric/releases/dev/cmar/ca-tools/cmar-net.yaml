@@ -77,5 +77,5 @@ spec:
       name: peer0,-      
     peer_count: "1"
     checks:
-      refresh_cert_value: False
+      refresh_cert_value: true
       add_peer_value: False
