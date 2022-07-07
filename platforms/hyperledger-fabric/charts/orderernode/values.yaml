@@ -41,6 +41,7 @@ orderer:
   #Provide the interval in which the orderer to signal the connection has kept alive  
   #Eg. keepaliveserverinterval: 10s
   keepaliveserverinterval: 10s
+  refresh_cert_value: {{ refresh_cert_value }}
 
 consensus:
   #Provide name of the consensus. Currently support raft and kafka
