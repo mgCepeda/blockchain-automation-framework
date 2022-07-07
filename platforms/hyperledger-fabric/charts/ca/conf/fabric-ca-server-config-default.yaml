@@ -276,7 +276,7 @@ signing:
     default:
       usage:
         - digital signature
-      expiry: 8760h
+      expiry: 12h
     profiles:
       ca:
          usage:
@@ -293,7 +293,7 @@ signing:
             - server auth
             - client auth
             - key agreement
-         expiry: 8760h
+         expiry: 12h
 
 ###########################################################################
 #  Certificate Signing Request (CSR) section.
