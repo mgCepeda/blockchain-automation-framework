@@ -1,0 +1,27 @@
+##############################################################################################
+#  Copyright Accenture. All Rights Reserved.
+#
+#  SPDX-License-Identifier: Apache-2.0
+##############################################################################################
+
+#############################################################################################
+# This role ...
+#############################################################################################
+
+############################################################################################
+
+
+   
+# This task copies the tls server.crt from vault
+# to the build directory
+- name: Fetch the tls server.crt from vault
+  shell: |
+    vault kv get -field=server.crt {{ vault.secret_path | default('secretsv2') }}/crypto/ordererOrganizations/{{ component_ns }}/orderers/{{ orderer.name }}.{{ component_ns }}/tls > server.crt
+    mkdir -p {{ build_path }}/old-cert/{{ orderer.name }}
+    mv server.crt {{ build_path }}/old-cert/{{ orderer.name }}
+  environment:
+    VAULT_ADDR: "{{ vault.url }}"
+    VAULT_TOKEN: "{{ vault.root_token }}"
+  loop: "{{ orderers }}"
+  loop_control:
+    loop_var: orderer  

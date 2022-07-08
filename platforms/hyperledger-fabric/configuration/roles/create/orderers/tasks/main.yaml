@@ -39,6 +39,7 @@
     alpine_image: "{{ docker_url }}/alpine-utils:1.0"
     type: "orderers"
     consensus: "{{component_services.consensus}}"
+    refresh_cert_value: "{{ refresh_cert | default(false) | quote }}"
     genesis: "{{ lookup('file', '{{ build_path }}/channel-artifacts/genesis.block.base64') }}"
   loop: "{{ component_services.orderers }}"
   loop_control:

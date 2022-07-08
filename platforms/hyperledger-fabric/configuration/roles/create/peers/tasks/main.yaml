@@ -9,6 +9,43 @@
 # to the vault.
 #############################################################################################
 
+# This task delete the previously created ca-tools release file
+- name: Delete release from peers
+  file:
+    path: "{{ values_dir }}/{{ name }}/values-{{ peer.name }}.yaml"
+    state: absent
+  vars:
+    name: "{{ item.name | lower }}"
+  loop: "{{ component_services.peers }}"
+  loop_control:
+    loop_var: peer 
+  when: refresh_cert is defined and refresh_cert == 'true'
+
+#Git Push : Deleting the previously created CA-Tools value file
+- name: Git Push
+  include_role: 
+    name: "{{ playbook_dir }}/../../shared/configuration/roles/git_push"
+  vars:
+    GIT_DIR: "{{ playbook_dir }}/../../../"
+    gitops: "{{ item.gitops }}"
+    GIT_RESET_PATH: "platforms/hyperledger-fabric/configuration"
+    msg: "[ci skip] Deleting the previously created CA-Tools value file"
+  when: refresh_cert is defined and refresh_cert == 'true'
+
+# This task delete the previously created ca-tools HelmRelease
+- name: Delete the previous CA-Tools HelmRelease
+  k8s:
+    kind: HelmRelease
+    name: "{{ item.name | lower }}-{{ peer.name }}"
+    namespace: "{{ namespace }}"
+    state: absent
+    kubeconfig: "{{ item.k8s.config_file }}"
+    context: "{{ item.k8s.context }}"
+  loop: "{{ component_services.peers }}"
+  loop_control:
+    loop_var: peer 
+  when: refresh_cert is defined and refresh_cert == 'true'
+
 ############################################################################################
 # This task is the nested task for main.yaml which helps to iterate over all peers
 - name: Create Value files for Organization Peers

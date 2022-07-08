@@ -48,6 +48,7 @@ spec:
       localmspid: {{ org_name }}MSP
       tlsstatus: true
       keepaliveserverinterval: 10s
+      refresh_cert_value: {{ refresh_cert_value }}
     
     consensus:
       name: {{ orderer.consensus }}

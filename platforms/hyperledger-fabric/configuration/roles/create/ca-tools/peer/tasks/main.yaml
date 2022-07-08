@@ -20,6 +20,12 @@
       - name = {{ component_name }}
   when: add_peer is not defined or add_peer != 'true'
 
+- name: "Delete old certificates"
+  include_tasks: delete_old_certs.yaml
+  vars:
+    org_name: "{{ item.name | lower }}"
+  when: refresh_cert is defined and refresh_cert == 'true'
+
 # Check orderer-certificate file exists
 - name: Check that orderer-certificate file exists
   stat:
@@ -101,7 +107,7 @@
     state: absent
   vars:
     name: "ca-tools"
-  when: add_peer is defined and add_peer == 'true'
+  when: (add_peer is defined and add_peer == 'true') or (refresh_cert is defined and refresh_cert == 'true')
 
 #Git Push : Deleting the previously created CA-Tools value file
 - name: Git Push
@@ -112,7 +118,7 @@
     gitops: "{{ item.gitops }}"
     GIT_RESET_PATH: "platforms/hyperledger-fabric/configuration"
     msg: "[ci skip] Deleting the previously created CA-Tools value file"
-  when: add_peer is defined and add_peer == 'true'
+  when: (add_peer is defined and add_peer == 'true') or (refresh_cert is defined and refresh_cert == 'true')
 
 # This task delete the previously created ca-tools HelmRelease
 - name: Delete the previous CA-Tools HelmRelease
@@ -123,7 +129,7 @@
     state: absent
     kubeconfig: "{{ kubernetes.config_file }}"
     context: "{{ kubernetes.context }}"
-  when: add_peer is defined and add_peer == 'true'
+  when: (add_peer is defined and add_peer == 'true') or (refresh_cert is defined and refresh_cert == 'true')
 
 ############################################################################################
 # This task creates the CA-tools value files
