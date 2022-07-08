@@ -13,7 +13,7 @@ metadata:
 spec:
   storageClassName: {{ $.Values.storage.class }}
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: {{ $.Values.storage.size }}

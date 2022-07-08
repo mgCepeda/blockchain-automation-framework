@@ -37,6 +37,29 @@
     loop_control:
       loop_var: org
     when: org.type == 'orderer'
+  
+  # # This role creates value file new orderer
+  # - name: "create new orderer"
+  #   include_role:
+  #     name: "create/orderers"
+  #   vars:
+  #     build_path: "./build"
+  #     namespace: "{{ item.name | lower}}-net"
+  #     component_type: "{{ item.type | lower}}"
+  #     component_services: "{{ item.services }}"
+  #     vault: "{{ item.vault }}"
+  #     git_protocol: "{{ item.gitops.git_protocol }}"
+  #     git_url: "{{ item.gitops.git_url }}"
+  #     git_branch: "{{ item.gitops.branch }}"
+  #     docker_url: "{{ network.docker.url }}"
+  #     charts_dir: "{{ item.gitops.chart_source }}"
+  #     values_dir: "{{playbook_dir}}/../../../{{item.gitops.release_dir}}/{{ item.name | lower }}"
+  #   loop: "{{ network['organizations'] }}"
+  #   when: item.type == 'orderer'
+  
+  # - pause:
+  #     prompt: "testing playbook"
+  #     minutes: 6
 
   # Create CA Tools helm-value files and check-in
   - name: Create CA tools for each organization
@@ -120,10 +143,6 @@
   #     loop_var: org
   #   when: org.type == "peer" and org.org_status == "new"
    
-  - pause:
-      prompt: "testing playbook"
-      minutes: 6
-
   # # Generate script to modify the fetched configuration block
   # - name: "Modify the system channel with tls information of new orderer"
   #   include_role:
