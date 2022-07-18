@@ -64,4 +64,4 @@ spec:
       ca_url: ca.smar-net:7054
 
     orderers:
-      name: orderer1-orderer2-orderer3-
+      name: orderer7-orderer8-orderer9-orderer10-
