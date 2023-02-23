@@ -20,7 +20,7 @@ spec:
       name: {{ component_name }}
       namespace: {{ component_ns }}
     image:
-      alpineutils: {{ network.docker.url }}/alpine-utils:1.0
+      alpineutils: ghcr.io/mgcepeda/alpine-utils:1.1
       pullSecret: regcred
       pullPolicy: IfNotPresent
     network:
