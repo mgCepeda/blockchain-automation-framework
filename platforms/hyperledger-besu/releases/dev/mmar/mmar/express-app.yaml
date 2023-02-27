@@ -1,0 +1,52 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: mmar-expressapi
+  namespace: mmar-bes
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: mmarbesu-expressapi
+  interval: 1m
+  chart:
+   spec:
+    chart: examples/supplychain-app/charts/expressapp-besu
+    sourceRef:
+      kind: GitRepository
+      name: flux-be-mar
+      namespace: flux-be-mar
+  values:
+    nodeName: mmar-expressapi
+    metadata:
+      namespace: mmar-bes
+    replicaCount: 1
+    vault:
+      address: http://a94f258ac51304b63a9bceb42a204cb6-2100507752.eu-west-1.elb.amazonaws.com:20002
+      secretprefix: secretsv2/data/mmar-bes/smartContracts
+      node_address_secret: secretsv2/data/mmar-bes/crypto/mmar/data
+      serviceaccountname: vault-auth
+      contractName: General
+      role: vault-role
+      authpath: besummar
+    images:
+      alpineutils: ghcr.io/hyperledger/alpine-utils:1.0
+    expressapp:
+      serviceType: ClusterIP
+      image: ghcr.io/mgcepeda/bevel-supplychain-besu:express-app-latest
+      pullPolicy: IfNotPresent
+      pullSecrets: regcred
+      nodePorts:
+        port: 3000
+        targetPort: 3000
+        name: tcp
+      env:
+        geth_address: http://mmar.bes.dev2.aws.blockchaincloudpoc-develop.com:15066
+        node_subject: O=Manufacturer,OU=Manufacturer,L=47.38/8.54/Zurich,C=CH
+        node_organization: Manufacturer
+        node_organization_unit: manufacturer
+        protocol: qbft
+    proxy:
+      provider: ambassador
+      name: mmar
+      external_url_suffix: bes.dev2.aws.blockchaincloudpoc-develop.com
+      peer_name: mmar
