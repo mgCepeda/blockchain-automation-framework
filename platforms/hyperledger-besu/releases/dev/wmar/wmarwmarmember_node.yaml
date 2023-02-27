@@ -1,0 +1,78 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: wmarwmarmember-node
+  namespace: wmar-bes
+  annotations:
+    flux.weave.works/automated: "false"
+spec:
+  releaseName: wmarwmarmember-node
+  interval: 1m
+  chart:
+   spec:
+    chart: platforms/hyperledger-besu/charts/node_besu
+    sourceRef:
+      kind: GitRepository
+      name: flux-be-mar
+      namespace: flux-be-mar
+  values:
+    metadata:
+      namespace: wmar-bes
+      labels:
+    replicaCount: 1
+    staticnodes:
+      - "enode://c3571a5d50dc4d173d349c7a455fec51608630a0817d8cc589ee158d78163e9385c9b320bb36849dedbcf9213a1491ad53817a87a95ba840ba3a6d2a9300235c@validator1.bes.dev2.aws.blockchaincloudpoc-develop.com:15061"
+      - "enode://e5ddd6abedc5a4114211e922db63ae0531094e12b62978249012dd841a42431f1f58e17bdb1c9b8b6cf3b7181b8f0c2dfc4da31ba956dd13db1cbb392217dd97@validator2.bes.dev2.aws.blockchaincloudpoc-develop.com:15063"
+      - "enode://07c106059250438cfa3834905be6d8ab184243d03caa398c16372f9e0350112e4379a1d483586404b5c25dfb97970d3ea0c1e8c84c32a1f00ad69737a5d16ebe@cmar.bes.dev2.aws.blockchaincloudpoc-develop.com:15069"
+      - "enode://054d727db70de0ce66e558ff5ef1920ff98226e49320b7a7c7400834fddd7add4c48f05e6bc68cc52627d1fd38c71ddc83f36eb6edfc82fe476764829831d622@mmar.bes.dev2.aws.blockchaincloudpoc-develop.com:15065"
+      - "enode://bf2f7f7e644f7f1db7c7ad733ea41e1cdb1ffc90eeccdf4e56a865dd9932beb030d17e7322f5c42cf97722cf3d2f83b89da966e6924d922b6d1f94e8816930cd@wmar.bes.dev2.aws.blockchaincloudpoc-develop.com:15067"
+      - "enode://513bf5b14f9d99912099f15086fd1527c695a8c5e3b4203e76b778d0feef101b92b2cb9aae60acab397b9ec7c05306aeb1a00c2c526e85ade6276b8d04b6db1d@smar.bes.dev2.aws.blockchaincloudpoc-develop.com:15059"
+
+    liveliness_check:
+      enabled: false
+    healthcheck:
+      readinessthreshold: 100
+      readinesscheckinterval: 5
+    proxy:
+      provider: ambassador
+      external_url: wmar.bes.dev2.aws.blockchaincloudpoc-develop.com
+      p2p: 15067
+      rpc: 15068
+
+    images:
+      node: hyperledger/besu:22.10.3
+      alpineutils: ghcr.io/hyperledger/alpine-utils:1.0
+      pullPolicy: IfNotPresent
+
+    node:
+      name: wmar
+      consensus: qbft
+      subject: O=Warehouse,OU=Warehouse,L=42.36/-71.06/Boston,C=US
+      mountPath: /opt/besu/data
+      servicetype: ClusterIP
+      imagePullSecret: regcred
+      ports:
+        p2p: 30303
+        rpc: 8545
+        ws: 8546
+
+    tm:
+      type: tessera
+      tls: True
+      url: "https://wmar-tessera.wmar-bes:8888"
+
+    storage:
+      storageclassname: awsstorageclass
+      storagesize: 1Gi
+
+    vault:
+      address: http://a94f258ac51304b63a9bceb42a204cb6-2100507752.eu-west-1.elb.amazonaws.com:20002
+      secretprefix: secretsv2/data/wmar-bes/crypto/wmar
+      serviceaccountname: vault-auth
+      keyname: data
+      tmdir: tm
+      tlsdir: tls
+      role: vault-role
+      authpath: besuwmar
+
+    genesis: ewogICJjb25maWciIDogewogICAgImNoYWluSWQiIDogMjAxOCwKICAgICJjb25zdGFudGlub3BsZWZpeGJsb2NrIiA6IDAsCiAgICAiY29udHJhY3RTaXplTGltaXQiIDogMjE0NzQ4MzY0NywKICAgICJxYmZ0IiA6IHsKICAgICAgImJsb2NrcGVyaW9kc2Vjb25kcyIgOiAyLAogICAgICAiZXBvY2hsZW5ndGgiIDogMzAwMDAsCiAgICAgICJyZXF1ZXN0dGltZW91dHNlY29uZHMiIDogMTAKICAgIH0KICB9LAogICJub25jZSIgOiAiMHgwIiwKICAidGltZXN0YW1wIiA6ICIweDU4ZWU0MGJhIiwKICAiZ2FzTGltaXQiIDogIjB4MWZmZmZmZmZmZmZmZmYiLAogICJkaWZmaWN1bHR5IiA6ICIweDEiLAogICJleHRyYURhdGEiIDogIjB4ZjhhNGEwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMGY4N2U5NDMzNGI2Njg3MzAyMGJkM2FmMTIyYmI5YTY5ZGFmNDVlNmZhODQ3NDk5NDQzOTk1ZDI5NjA5NWZiZDgzMzM4OTM5YmU4N2Q2MWQwYzQ5ZWZkYmM5NDNkMmE5OGZjNzBjZDQ3YzFmMDIxOTUxMDkxODI5Y2Y4M2ZhZjAwODM5NDc1ODc3NzQxMTYzNWFkMGNkZTdkZTFlNmNkZTI2OTZkMDI3ZDNmM2I5NDE2MGNhMzA3OTc3MzE3MzZjOTQ3ZDNmNDQ4YmNiZDI3MTgwMWQ0YmM5NGMzMWE5OWIzMDYwMGM1MGNjYmM5NjFhZTAzNmNmYWZkNmM3Zjc2OWFjMDgwYzAiCn0=
