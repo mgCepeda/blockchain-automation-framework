@@ -27,7 +27,7 @@ env:
   IMAGE_PATH: ghcr.io/${{ github.repository_owner }}
 
 jobs:
-  # on push to develop branch, create docker tags latest and jdk8-latest
+  # on push to develop branch, create docker tags latest and jdk8-latestttt
   expressapi-build-latest:
     if: ${{ startsWith(github.ref, 'refs/heads/test') }}
     runs-on: ubuntu-latest
