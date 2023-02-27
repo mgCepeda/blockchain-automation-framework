@@ -1,0 +1,78 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: smarsmarmember-node
+  namespace: smar-bes
+  annotations:
+    flux.weave.works/automated: "false"
+spec:
+  releaseName: smarsmarmember-node
+  interval: 1m
+  chart:
+   spec:
+    chart: platforms/hyperledger-besu/charts/node_besu
+    sourceRef:
+      kind: GitRepository
+      name: flux-bes-mar
+      namespace: flux-bes-mar
+  values:
+    metadata:
+      namespace: smar-bes
+      labels:
+    replicaCount: 1
+    staticnodes:
+      - "enode://09ed831113ca17e51504f9e70a53c6345b907e3ca78a937c60869f104590d2f6890af2abec441804b0c31c08f874414a35393debca44b8a13d78839e0f28828f@validator1.bes.dev2.aws.blockchaincloudpoc-develop.com:15061"
+      - "enode://3b746ee862c7bddf60581ca31b9b8ef2e78ecd901e547e07fcac62dfdd782d551c03f11ecac1b23f147a58d1403562237f4f4edc05d40a371f423b66d97d0f05@validator2.bes.dev2.aws.blockchaincloudpoc-develop.com:15063"
+      - "enode://b23c9b2606f9a437b22ecf7d5e80a59905d7b213dc68c4b5717ba8a19c33b489726b39c634fdbd21a7b6e5217f0212f8ff12325538506864b421926ade1abc5a@cmar.bes.dev2.aws.blockchaincloudpoc-develop.com:15069"
+      - "enode://bb7f0979dcc41b4ba0a8ef44cf88416b012f648075930c4156584f7032d3c14f5f382e2180141dbdf999577e60c9d3e6ca8d51250727aeffc308ae5bf96c2b97@mmar.bes.dev2.aws.blockchaincloudpoc-develop.com:15065"
+      - "enode://88786d318c8e12809dd2f05033b3a3d1ef1938e47e2d46c7f396ef1a42c4371076afd3bc176925a677281f161668619740b50fbae43f0c312f1a0fc35785ba2b@wmar.bes.dev2.aws.blockchaincloudpoc-develop.com:15067"
+      - "enode://d9b1e8406fd672c635f4de4583e1bb7844500ce327c55e2d03ec400abf5aa4d20b0d2767e67d5068f349f4160db64b7f95b75ad5b79751268996a5cfe0d6cc02@smar.bes.dev2.aws.blockchaincloudpoc-develop.com:15059"
+
+    liveliness_check:
+      enabled: false
+    healthcheck:
+      readinessthreshold: 100
+      readinesscheckinterval: 5
+    proxy:
+      provider: ambassador
+      external_url: smar.bes.dev2.aws.blockchaincloudpoc-develop.com
+      p2p: 15059
+      rpc: 15060
+
+    images:
+      node: hyperledger/besu:22.10.2
+      alpineutils: ghcr.io/hyperledger/alpine-utils:1.0
+      pullPolicy: IfNotPresent
+
+    node:
+      name: smar
+      consensus: ibft
+      subject: O=Store,OU=Store,L=40.73/-74/New York,C=US
+      mountPath: /opt/besu/data
+      servicetype: ClusterIP
+      imagePullSecret: regcred
+      ports:
+        p2p: 30303
+        rpc: 8545
+        ws: 8546
+
+    tm:
+      type: tessera
+      tls: True
+      url: "https://smar-tessera.smar-bes:8888"
+
+    storage:
+      storageclassname: awsstorageclass
+      storagesize: 1Gi
+
+    vault:
+      address: http://a94f258ac51304b63a9bceb42a204cb6-2100507752.eu-west-1.elb.amazonaws.com:20002
+      secretprefix: secretsv2/data/smar-bes/crypto/smar
+      serviceaccountname: vault-auth
+      keyname: data
+      tmdir: tm
+      tlsdir: tls
+      role: vault-role
+      authpath: besusmar
+
+    genesis: ewogICJjb25maWciOiB7CiAgICAiY2hhaW5JZCI6IDIwMTgsCiAgICAiY29uc3RhbnRpbm9wbGVmaXhibG9jayI6IDAsCiAgICAiY29udHJhY3RTaXplTGltaXQiOiAyMTQ3NDgzNjQ3LAogICAgImliZnQyIjogewogICAgICAiYmxvY2twZXJpb2RzZWNvbmRzIjogMiwKICAgICAgImVwb2NobGVuZ3RoIjogMzAwMDAsCiAgICAgICJyZXF1ZXN0dGltZW91dHNlY29uZHMiOiAxMAogICAgfQogIH0sCiAgIm5vbmNlIjogIjB4MCIsCiAgInRpbWVzdGFtcCI6ICIweDU4ZWU0MGJhIiwKICAiZ2FzTGltaXQiOiAiMHgxZmZmZmZmZmZmZmZmZiIsCiAgImRpZmZpY3VsdHkiOiAiMHgxIiwKICAiZXh0cmFEYXRhIjogIjB4Zjg1M2EwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMGVhOTQ2NTQ3NWIxNzQ4YjEyMWRjZDE1MmNiYmJlNzE0YTk3MDUzZjM1MTRmOTRmMzU1MjY0NzM5MTI1NzAzY2U3MTQ0NDA0NWJmNWE1YzU1NzdjMWEyODA4NDAwMDAwMDAwYzAiCn0=
