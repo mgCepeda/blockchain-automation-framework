@@ -4,7 +4,7 @@
 #  SPDX-License-Identifier: Apache-2.0
 ##############################################################################################
 
-# Build apline-utils docker image triggered by :
+# Build expressapi docker image triggered by :
 #  - push on develop branch for latest tags 
 #  - create tag vx.y.z for release tags
 #  - Can be triggered manually
