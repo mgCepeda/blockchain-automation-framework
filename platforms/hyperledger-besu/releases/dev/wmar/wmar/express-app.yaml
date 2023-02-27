@@ -1,0 +1,52 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: wmar-expressapi
+  namespace: wmar-bes
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: wmarbesu-expressapi
+  interval: 1m
+  chart:
+   spec:
+    chart: examples/supplychain-app/charts/expressapp-besu
+    sourceRef:
+      kind: GitRepository
+      name: flux-bes-mar
+      namespace: flux-bes-mar
+  values:
+    nodeName: wmar-expressapi
+    metadata:
+      namespace: wmar-bes
+    replicaCount: 1
+    vault:
+      address: http://a94f258ac51304b63a9bceb42a204cb6-2100507752.eu-west-1.elb.amazonaws.com:20002
+      secretprefix: secretsv2/data/wmar-bes/smartContracts
+      node_address_secret: secretsv2/data/wmar-bes/crypto/wmar/data
+      serviceaccountname: vault-auth
+      contractName: General
+      role: vault-role
+      authpath: besuwmar
+    images:
+      alpineutils: ghcr.io/hyperledger/alpine-utils:1.0
+    expressapp:
+      serviceType: ClusterIP
+      image: ghcr.io/mgcepeda/bevel-supplychain-besu:express-app-latest
+      pullPolicy: IfNotPresent
+      pullSecrets: regcred
+      nodePorts:
+        port: 3000
+        targetPort: 3000
+        name: tcp
+      env:
+        geth_address: http://wmar.bes.dev2.aws.blockchaincloudpoc-develop.com:15068
+        node_subject: O=Warehouse,OU=Warehouse,L=42.36/-71.06/Boston,C=US
+        node_organization: Warehouse
+        node_organization_unit: warehouse
+        protocol: ibft
+    proxy:
+      provider: ambassador
+      name: wmar
+      external_url_suffix: bes.dev2.aws.blockchaincloudpoc-develop.com
+      peer_name: wmar
