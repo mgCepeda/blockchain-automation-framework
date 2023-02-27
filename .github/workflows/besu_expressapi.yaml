@@ -27,9 +27,9 @@ env:
   IMAGE_PATH: ghcr.io/${{ github.repository_owner }}
 
 jobs:
-  # on push to develop branch, create docker tags latest and jdk8-latestttt
+  # on push to develop branch, create docker tags latest and jdk8-latest
   expressapi-build-latest:
-    if: ${{ startsWith(github.ref, 'refs/heads/test') }}
+    if: ${{ startsWith(github.ref, 'refs/heads/besu-expressapi-workflow') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
