@@ -1,0 +1,78 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: scmarvalidator2validator-node
+  namespace: scmar-bes
+  annotations:
+    flux.weave.works/automated: "false"
+spec:
+  releaseName: scmarvalidator2validator-node
+  interval: 1m
+  chart:
+   spec:
+    chart: platforms/hyperledger-besu/charts/node_validator
+    sourceRef:
+      kind: GitRepository
+      name: flux-be-mar
+      namespace: flux-be-mar
+  values:
+    replicaCount: 1
+
+    healthcheck:
+      readinessthreshold: 100
+      readinesscheckinterval: 5
+
+    staticnodes:
+      - "enode://c00409a34a541250fcc05dce2a87b70eadfe8f1065a719e01c655d22fd84ab81339fc4b18ae332c74562183a92711a22280c5a350b2dd8c69db81780fbb5f86f@validator1.bes.dev2.aws.blockchaincloudpoc-develop.com:15061"
+      - "enode://ce1873f7c8f12e70780ad04ab50af1e7126755fe7123d4073460b0b8a4bfeb171dfb3dae84b11f6ab1fc38245bd73ba856259c60f75082bca2e2b55cafea1b32@validator2.bes.dev2.aws.blockchaincloudpoc-develop.com:15063"
+      - "enode://5d8cb7ff879663987de62d399914d35363285090f03b796ff33594e152ec40bace2070ea2762b4b4d71824df14a7c663c55b128e377793208379b93a38d15417@cmar.bes.dev2.aws.blockchaincloudpoc-develop.com:15069"
+      - "enode://92b85a178b146ff9470ece07c2e86d2a9ce71fc8d886f2c4a550725af8cf21548aa5afa1c6ba7de4fc53e45d5fb5e563d5f1fffe0141e37f027d8a3feca734d4@mmar.bes.dev2.aws.blockchaincloudpoc-develop.com:15065"
+      - "enode://f7403a32727f6773925ffbc76644d690fff10f35b6710556c0f2a9139488b6b8db5eba37afb9620c7783d6a7302fd3d7667250f9bbdc800126b54731c07aa386@wmar.bes.dev2.aws.blockchaincloudpoc-develop.com:15067"
+      - "enode://a489aefc6321170a4fa761a9d1f95e6327665b24e83cbd483668b12dc03768cdde377d3174efa1b1adda86a02a1a17300ef5dd61caee3eb8ae0d3a23aa947fc7@smar.bes.dev2.aws.blockchaincloudpoc-develop.com:15059"
+
+    metadata:
+      namespace: scmar-bes
+      labels:
+
+    ambassador:
+      external_url_suffix: bes.dev2.aws.blockchaincloudpoc-develop.com
+
+    liveliness_check:
+      enabled: false
+    proxy:
+      provider: ambassador
+      external_url: scmar.bes.dev2.aws.blockchaincloudpoc-develop.com
+      p2p: 15063
+      rpc: 15064
+
+    images:
+      node: hyperledger/besu:22.10.3
+      alpineutils: ghcr.io/hyperledger/alpine-utils:1.0
+      pullPolicy: IfNotPresent
+
+    node:
+      name: validator2
+      tls: True
+      consensus: qbft
+      mountPath: /opt/besu/data
+      servicetype: ClusterIP
+      imagePullSecret: regcred
+      ports:
+        p2p: 30303
+        rpc: 8545
+        ws: 8546
+
+    storage:
+      storageclassname: awsstorageclass
+      storagesize: 1Gi
+
+    vault:
+      address: http://a94f258ac51304b63a9bceb42a204cb6-2100507752.eu-west-1.elb.amazonaws.com:20002
+      secretprefix: secretsv2/data/scmar-bes/crypto/validator2
+      serviceaccountname: vault-auth
+      keyname: data
+      tlsdir: tls
+      role: vault-role
+      authpath: besuscmar
+
+    genesis: ewogICJjb25maWciIDogewogICAgImNoYWluSWQiIDogMjAxOCwKICAgICJjb25zdGFudGlub3BsZWZpeGJsb2NrIiA6IDAsCiAgICAiY29udHJhY3RTaXplTGltaXQiIDogMjE0NzQ4MzY0NywKICAgICJxYmZ0IiA6IHsKICAgICAgImJsb2NrcGVyaW9kc2Vjb25kcyIgOiAyLAogICAgICAiZXBvY2hsZW5ndGgiIDogMzAwMDAsCiAgICAgICJyZXF1ZXN0dGltZW91dHNlY29uZHMiIDogMTAKICAgIH0KICB9LAogICJub25jZSIgOiAiMHgwIiwKICAidGltZXN0YW1wIiA6ICIweDU4ZWU0MGJhIiwKICAiZ2FzTGltaXQiIDogIjB4MWZmZmZmZmZmZmZmZmYiLAogICJkaWZmaWN1bHR5IiA6ICIweDEiLAogICJleHRyYURhdGEiIDogIjB4ZjhhNGEwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMGY4N2U5NGM4YWY1ZjRkNDAxZDBlNWZiYWM0N2QyYmYzODU0Yzk4MjZiNjc4MjM5NGY2YWIzYjZhMzIwMTcxZDQ3YmUwY2I0NzFiZmZmOTllODFhM2Q1NTM5NGIzOGYzMmVjMmQ3ZWJkNTVkOTMzZGY1ZmY3ZDA0Yzk2OTZiZGIzODQ5NGE0ZmYwYzFhNDM2MGJlMGE0MTgxODViNzkyMDA4YmE0ODNjZDc3NmY5NDBlNmI2NTQ4MDYyYTZkZWNlNGMwNDE3YjM0MjExNDU4MTcyYmZhYjE5NDA4YTAzM2FlZDM2YTNkNTRhOTYzZjgxMDdhNDMzNTA5NWYxNTg4NjBjMDgwYzAiCn0=
