@@ -1,0 +1,68 @@
+apiVersion:  helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cmartessera
+  namespace: cmar-bes
+  annotations:
+    flux.weave.works/automated: "false"
+spec:
+  releaseName: cmartessera
+  interval: 1m
+  chart:
+   spec:
+    chart: platforms/hyperledger-besu/charts/node_tessera
+    sourceRef:
+      kind: GitRepository
+      name: flux-be-marr
+      namespace: flux-be-marr
+  values:
+    replicaCount: 1
+    metadata:
+      namespace: cmar-bes
+      labels:
+    images:
+      alpineutils: ghcr.io/mgcepeda/alpine-utils:1.1
+      tessera: quorumengineering/tessera:hashicorp-21.7.3
+      busybox: busybox
+      mysql: mysql/mysql-server:5.7
+      imagePullSecret: regcred
+      pullPolicy: IfNotPresent
+    tessera:
+      name: cmar-tessera
+      dbname: demodb
+      dburl: "jdbc:mysql://cmar-tessera:3306/demodb"
+      dbusername: demouser
+      tls: "STRICT"
+      url: "https://cmar.bes.dev2.aws.blockchaincloudpoc-develop.com:443"
+      clienturl: "https://cmar-tessera:8888"
+      othernodes:
+        - url: https://cmar.bes.dev2.aws.blockchaincloudpoc-develop.com
+        - url: https://mmar.bes.dev2.aws.blockchaincloudpoc-develop.com
+      trust: "CA_OR_TOFU"
+
+      servicetype: ClusterIP
+      ports:
+        tm: 443
+        db: 3306
+        client: 8888
+      mountPath: /etc/tessera/data
+      ambassadorSecret: cmar-ambassador-certs
+    vault:
+      address: http://a94f258ac51304b63a9bceb42a204cb6-2100507752.eu-west-1.elb.amazonaws.com:20002
+      secretengine: secretsv2
+      tmsecretpath: cmar-bes/crypto/cmar/tm
+      secretprefix: secretsv2/data/cmar-bes/crypto/cmar
+      serviceaccountname: vault-auth
+      keyname: credentials
+      tm_keyname: tm
+      tlsdir: tls
+      role: vault-role
+      authpath: besucmar
+    proxy:
+      provider: "ambassador"
+      external_url: cmar.bes.dev2.aws.blockchaincloudpoc-develop.com
+      portTM: 443
+    storage:
+      storageclassname: awsstorageclass
+      storagesize: 1Gi
+      dbstorage: 1Gi
