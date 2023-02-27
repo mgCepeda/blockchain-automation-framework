@@ -32,7 +32,7 @@ spec:
       alpineutils: {{ network.docker.url }}/alpine-utils:1.0
     expressapp:
       serviceType: ClusterIP
-      image: {{ network.docker.url }}/{{ express_app_image }}
+      image: ghcr.io/mgcepeda/{{ express_app_image }}
       pullPolicy: IfNotPresent
       pullSecrets: regcred
       nodePorts:
