@@ -17,7 +17,7 @@ on:
       - v*
   push:
     branches:
-      - test
+      - besu-expressapi-workflow
     paths:
       - '.github/workflows/besu_expressapi.yaml'
       - 'examples/supplychain-app/besu/express_nodeJS/Dockerfile'
