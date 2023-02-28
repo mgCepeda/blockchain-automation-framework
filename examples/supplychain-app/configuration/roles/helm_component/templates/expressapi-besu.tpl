@@ -33,7 +33,7 @@ spec:
     expressapp:
       serviceType: ClusterIP
       image: ghcr.io/mgcepeda/{{ express_app_image }}
-      pullPolicy: IfNotPresent
+      pullPolicy: Always
       pullSecrets: regcred
       nodePorts:
         port: {{ peer_express_api_port }}
