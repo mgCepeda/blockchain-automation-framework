@@ -15,7 +15,7 @@ spec:
         kind: GitRepository
         name: flux-{{ network.env.type }}
         namespace: flux-{{ network.env.type }}
-      chart: {{ charts_dir }}/catools
+      chart: {{ charts_dir }}/fabric-catools
   values:
     metadata:
       namespace: {{ component_name }}
@@ -47,11 +47,10 @@ spec:
     replicaCount: 1
 
     image:
-      repository: hyperledger/fabric-ca-tools
-      tag: 1.2.1
+      alpineutils: {{ docker_url }}/{{ alpine_image }}
+      catools: {{ docker_url }}/{{ ca_tools_image }}
       pullPolicy: IfNotPresent
-      alpineutils: {{ alpine_image }}
-      
+    
     storage:
       storageclassname: {{ sc_name }}
       storagesize: 512Mi
@@ -68,7 +67,6 @@ spec:
       secretorderer: {{ vault.secret_path | default('secretsv2') }}/data/crypto/{{ component_type }}Organizations/{{ component_name }}/orderers
       secretpeer: {{ vault.secret_path | default('secretsv2') }}/data/crypto/{{ component_type }}Organizations/{{ component_name }}/peers
       secretpeerorderertls: {{ vault.secret_path | default('secretsv2') }}/data/crypto/{{ component_type }}Organizations/{{ component_name }}/orderer/tls
-      secretambassador: {{ vault.secret_path | default('secretsv2') }}/data/crypto/{{ component_type }}Organizations/{{ component_name }}/ambassador
       secretcert: {{ vault.secret_path | default('secretsv2') }}/data/crypto/{{ component_type }}Organizations/{{ component_name | e }}/ca?ca.{{ component_name | e }}-cert.pem
       secretkey: {{ vault.secret_path | default('secretsv2') }}/data/crypto/{{ component_type }}Organizations/{{ component_name | e }}/ca?{{ component_name | e }}-CA.key
       secretcouchdb: {{ vault.secret_path | default('secretsv2') }}/data/credentials/{{ component_name }}/couchdb/{{ org_name }}

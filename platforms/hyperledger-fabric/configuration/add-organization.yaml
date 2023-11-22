@@ -36,7 +36,20 @@
         release_dir: "{{ playbook_dir }}/../../../{{ item.gitops.release_dir }}/{{ item.name | lower }}"
       loop: "{{ network['organizations'] }}"
       when: item.org_status == 'new'
-    
+
+    # Setup script for Vault and OS Package Manager
+    - name: "Setup script for Vault and OS Package Manager"
+      include_role:
+        name: "{{ playbook_dir }}/../../shared/configuration/roles/setup/scripts"
+      vars:
+        namespace: "{{ org.name | lower }}-net"
+        network_type: "{{ network.type | lower }}"
+        kubernetes: "{{ org.k8s }}"
+      loop: "{{ network['organizations'] }}"
+      loop_control:
+        loop_var: org
+      when: org.org_status == 'new'
+
     # Setup Vault-Kubernetes accesses and Regcred for docker registry for new organization
     - include_role: 
         name: "{{ playbook_dir }}/../../shared/configuration/roles/setup/vault_kubernetes"
@@ -54,23 +67,24 @@
       loop: "{{ network['organizations'] }}"
       loop_control:
         loop_var: org
-      when: item.org_status == 'new'
+      when: org.org_status == 'new'
 
     # Create Storageclass for new organization
     - include_role:
-        name: "create/storageclass"
+        name: "{{ playbook_dir }}/../../../platforms/shared/configuration/roles/setup/storageclass"  
       vars:
-        org_name: "{{ item.name | lower }}"
-        cloudProvider: "{{ item.cloud_provider | lower }}"
+        org_name: "{{ org.name | lower }}"
+        cloudProvider: "{{ org.cloud_provider | lower }}"
         sc_name: "{{ org_name }}-{{ cloudProvider }}-storageclass"
-        region: "{{ item.k8s.region | default('eu-west-1') }}"
-        component_type: "{{ item.type | lower}}"
-        kubernetes: "{{ item.k8s }}"
+        region: "{{ org.k8s.region | default('eu-west-1') }}"
+        component_type: "{{ org.type | lower}}"
+        kubernetes: "{{ org.k8s }}"
         platform_suffix: "net"
         charts_dir: "platforms/shared/charts"
-        release_dir: "./build"
       loop: "{{ network['organizations'] }}"
-      when: item.org_status == 'new'
+      loop_control:
+        loop_var: org
+      when: org.org_status == 'new'
         
     # Create CA Server value files and check-in for new organization
     - include_role:
@@ -80,6 +94,7 @@
         component: "{{ item.name | lower}}"
         component_type: "{{ item.type | lower}}"
         component_services: "{{ item.services }}"
+        sc_name: "{{ component }}-{{ item.cloud_provider }}-storageclass"
         kubernetes: "{{ item.k8s }}"
         vault: "{{ item.vault }}"
         ca: "{{ item.services.ca }}"
@@ -124,9 +139,11 @@
         component_type: "{{ item.type | lower}}"
         component_services: "{{ item.services }}"
         orderer_org: "{{ item.orderer_org | lower }}"
+        sc_name: "{{ component }}-{{ item.cloud_provider | lower }}-storageclass"
         kubernetes: "{{ item.k8s }}"
         vault: "{{ item.vault }}"
         ca: "{{ item.services.ca }}"
+        docker_url: "{{ network.docker.url }}"
         gitops: "{{ item.gitops }}"
         values_dir: "{{ playbook_dir }}/../../../{{ item.gitops.release_dir }}/{{ item.name | lower }}"
       loop: "{{ network['organizations'] }}"

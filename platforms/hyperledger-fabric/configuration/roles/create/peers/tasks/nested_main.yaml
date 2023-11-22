@@ -1,11 +1,9 @@
-###########################################################################################
 # Remove existing value file for peer -- change to not use shell
 - name: Remove existing value file for {{ peer.name }}
   shell: |
     rm -f {{ values_dir }}/{{ item.name | lower }}/values-{{ peer.name }}.yaml
 
-############################################################################################
-# This task fetches the custom core.yaml
+# Fetch the custom core.yaml
 - name: Fetch the custom core.yaml
   shell: |
     cat {{ peer.configpath }} | base64 > {{ playbook_dir }}/build/{{ peer.name }}_{{ item.name | lower }}_core.yaml.base64
@@ -13,8 +11,7 @@
   when: 
     - peer.configpath is defined
 
-############################################################################################
-# This task is the nested task for main.yaml which helps to iterate over all peers
+# Create Value files for Organization Peers
 - name: Create Value files for Organization Peers
   include_role:
     name: helm_component
@@ -23,9 +20,6 @@
     sc_name: "{{ name }}-{{ item.cloud_provider | lower}}-storageclass"
     type: "value_peer"
     component_name: values-{{ peer.name }}
-    couchdb_image: "{{ couchdb_image_version[network.version] }}"
-    peer_image: "hyperledger/fabric-peer:{{ network.version }}"
-    alpine_image: "{{ docker_url }}/alpine-utils:1.0"
     peer_name: "{{ peer.name }}"
     peer_ns: "{{ namespace }}"
     provider: "{{ network.env.proxy }}"
@@ -33,8 +27,7 @@
     - peer.peerstatus is not defined or peer.peerstatus == 'new'
     - peer.configpath is not defined
 
-############################################################################################
-# This task is the nested task for main.yaml which helps to iterate over all peers
+# Create Value files for Organization Peers - external
 - name: Create Value files for Organization Peers - external
   include_role:
     name: helm_component
@@ -43,9 +36,6 @@
     sc_name: "{{ name }}-{{ item.cloud_provider | lower}}-storageclass"
     type: "value_peer"
     component_name: values-{{ peer.name }}
-    couchdb_image: "{{ couchdb_image_version[network.version] }}"
-    peer_image: "hyperledger/fabric-peer:{{ network.version }}"
-    alpine_image: "{{ docker_url }}/alpine-utils:1.0"
     peer_name: "{{ peer.name }}"
     peer_ns: "{{ namespace }}"
     provider: "{{ network.env.proxy }}"

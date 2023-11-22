@@ -15,7 +15,7 @@
             {"if": {"properties": { "type": { "const": "fabric" } } },
              "then": {
               "properties":{
-                "version":{ "type": "string","enum":["1.4.8","2.2.0","2.2.2","2.5.3"]},
+                "version":{ "type": "string","enum":["1.4.8","2.2.0","2.2.2","2.5.3","2.5.4"]},
                 "env": { "$ref":"#/definitions/shared_environment"},
                 "frontend": { "type": "string", "enum": ["enabled","disabled"]},
                 "consensus":{ "$ref":"#/definitions/fabric_service_consensus"},
@@ -28,7 +28,7 @@
             {"if": {"properties": { "type": { "const": "besu" } } },
              "then": {
               "properties":{
-                "version":{ "type": "string","enum":["1.5.5","21.1.0","21.1.1","21.10.6","22.10.2"]},
+                "version":{ "type": "string","enum":["21.1.0","21.1.1","21.10.6","22.10.2"]},
                 "env": { "$ref":"#/definitions/shared_env_ambassador"},
                 "config": {"$ref":"#/definitions/besu_config"},
                 "organizations": { "type":"array","minItems": 1,"items":{"$ref":"#/definitions/besu_organization"}},
@@ -77,7 +77,7 @@
             {"if": {"properties": { "type": { "const": "quorum" } } },
              "then": {
               "properties":{
-                "version":{ "type": "string","enum":["21.4.2","2.5.0"]},
+                "version":{ "type": "string","enum":["21.4.2","23.4.0"]},
                 "env": { "$ref":"#/definitions/shared_env_ambassador"},
                 "config": {"$ref":"#/definitions/quorum_config"},
                 "organizations": { "type":"array","minItems": 1,"items":{"$ref":"#/definitions/quorum_organization"}}
@@ -134,7 +134,7 @@
               "proxy": { "type": "string", "enum": ["haproxy","ambassador","none","istio"], "description": "Choice of the Cluster Ingress controller. 'none' only minikube does not use a proxy"},
               "retry_count": {"type": "integer", "minimum":5,"maximum":100,"description": "Retry count for the checks. Use a large number if your kubernetes cluster is slow."},
               "external_dns": { "type": "string", "enum": ["enabled", "disabled"], "description": "If the cluster has the external DNS service, this has to be set enabled so that the hosted zone is automatically updated."},
-              "namespace": { "type": "string", "description": "Proxy namespace"}
+              "proxy_namespace": { "type": "string", "description": "Proxy namespace"}
               },
             "required": [ "type","proxy","external_dns","retry_count" ]
         },
@@ -147,7 +147,7 @@
             "loadBalancerSourceRanges":{"type": ["string", "null"],"nullable": true,"pattern":"^([0-9]{1,3}\\.){3}[0-9]{1,3}\\/(0|8|16|24)$","description": "restrict inbound access to a single or list of IP adresses for the public Ambassador ports to enhance Hyperledger Bevel network security"},
             "retry_count": {"type": "integer", "minimum":5,"maximum":100,"description": "Retry count for the checks. Use a large number if your kubernetes cluster is slow."},
             "external_dns": { "type": "string", "enum": ["enabled", "disabled"], "description": "If the cluster has the external DNS service, this has to be set enabled so that the hosted zone is automatically updated."},
-            "namespace": { "type": "string", "description": "Proxy namespace" },
+            "proxy_namespace": { "type": "string", "description": "Proxy namespace" },
             "labels": {"$ref":"#/definitions/shared_env_labels", "description": "Labels for kubernetes components."}
             },
           "required": [ "type","proxy","external_dns","retry_count" ],
@@ -503,6 +503,10 @@
             "consortium": { "type": "string","pattern": "^[A-Za-z0-9-]{1,30}$","description":"Name of the consortium, the channel belongs to"},
             "channel_name": { "type": "string","pattern": "^[A-Za-z0-9-]{1,30}$","minLength":1,"maxLength":11,"description":"Name of the channel"},
             "channel_status":{ "type": "string","enum": ["new","existing"],"description":" (only needed to add channel to existing org. Possible values are `new` or `existing`"},
+            "osn_creator_org": { "type": "object", "properties": {
+              "name": { "type": "string","pattern": "^[a-z0-9-]{1,30}$","minLength":1,"maxLength":12,"description":"Organization name whose orderers will create the channel"}},
+            "required": [ "name"], "additionalProperties": false
+            },
             "genesis": { "type": "object", "properties": {
                 "name": { "type": "string","pattern": "^[A-Za-z0-9-]{1,30}$","description": "Name of the genesis block"}},
               "required": [ "name"], "additionalProperties": false
@@ -673,8 +677,9 @@
           "properties": {
             "name": { "type": "string","pattern": "^[a-z0-9-_]{1,30}$","description":"Name of the chaincode"},
             "version":  { "type": "string","pattern": "^[0-9]{1,5}$","description":"Version of the chaincode. Please do not use . (dot) in the version."},
+            "sequence":  { "type": "string","pattern": "^[0-9]{1,5}$","description":"Sequence of the chaincode. Update depending on your last chaincode version and sequence"},
             "maindirectory": { "type": "string","description":"Path of main.go file"},
-            "lang": {"type":"string","enum": ["golang","java"],"description":"The language in which the chaincode is written ( golang/ java)"},
+            "lang": {"type":"string","enum": ["golang","java","node"],"description":"The language in which the chaincode is written ( golang/java/node)"},
             "arguments": { "type": "string","description":"Init Arguments to the chaincode"},
             "endorsements": { "type": "string","description":"Endorsements (if any) provided along with the chaincode"},
             "repository": { "$ref":"#/definitions/fabric_chaincode_repository"},
@@ -704,8 +709,8 @@
           "properties": {
             "consensus": { "type": "string","enum": ["ibft","qbft","clique","ethash"],"description":"Currently supports ibft and qbft."},
             "subject":  { "type": "string","description":"This is the subject of the root CA which will be created for the Hyperledger Besu network. The root CA is for development purposes only, production networks should already have the root certificates."},
-            "transaction_manager": { "type": "string","enum": ["tessera","orion","none"],"description":"Supports orion or tessera. Please update the remaining items according to the transaction_manager chosen as not all values are valid for the transaction_manager. From version 21.x.x orion features have merged into tessera"},
-            "tm_version": { "type": "string","enum": ["1.6.0","21.1.0","21.1.1","21.7.3"],"description":"This is the version of transaction manager docker image that will be deployed. Supported versions: 1.6.0 for orion and 21.1.1 for tessera and orion."},
+            "transaction_manager": { "type": "string","enum": ["tessera","none"],"description":"Supports none or tessera. Please update the remaining items according to the transaction_manager chosen as not all values are valid for the transaction_manager."},
+            "tm_version": { "type": "string","enum": ["21.1.0","21.1.1","21.7.3"],"description":"This is the version of transaction manager docker image that will be deployed. Supported versions for tessera."},
             "tm_tls": { "type": "boolean","description":"Options are True and False. This enables TLS for the transaction manager and Besu node. False is not recommended for production."},
             "tm_trust": { "type": "string","enum": ["ca-or-tofu","ca","tofu"],"description":"This is the trust relationships for the transaction managers."},
             "genesis":  { "type": "string","pattern":"^(\/[^\/ ]*)+[^\/ ]+$","description":"This is the path where genesis.json will be stored for a new network; for adding new node, the existing network's genesis.json should be available in json format in this file."},
@@ -781,7 +786,8 @@
             "ws": { "$ref":"#/definitions/shared_port"},
             "db": { "$ref":"#/definitions/shared_port","description":"Port for MySQL database which is only applicable for tessera"},
             "tm_nodeport":  { "$ref":"#/definitions/shared_port_ambassador","description":"Port used by Transaction manager orion or tessera."},
-            "tm_clientport":  { "$ref":"#/definitions/shared_port"}
+            "tm_clientport":  { "$ref":"#/definitions/shared_port"},
+            "metrics": { "$ref": "#/definitions/shared_metrics"}
             },
           "required": [ "name","subject","geth_passphrase","p2p","rpc","ws"],
           "additionalProperties": false
@@ -870,8 +876,8 @@
           "properties": {
             "consensus": { "type": "string","enum": ["ibft","raft"],"description":"Currently supports raft or ibft. Please update the remaining items according to the consensus chosen as not all values are valid for both the consensus."},
             "subject":  { "type": "string","description":"This is the subject of the root CA which will be created for the Quorum network. The root CA is for development purposes only, production networks should already have the root certificates."},
-            "transaction_manager": { "type": "string","enum": ["tessera","constellation","none"],"description":"Options are tessera and constellation. Please update the remaining items according to the transaction_manager chosen as not all values are valid for both the transaction_manager."},
-            "tm_version":{},
+            "transaction_manager": { "type": "string","enum": ["tessera","none"],"description":"Options are tessera and none. Please update the remaining items according to the transaction_manager chosen as not all values are valid for both the transaction_manager."},
+            "tm_version": { "type": "string","enum": ["21.1.0","21.1.1","21.7.3","23.4.0"],"description":"This is the version of transaction manager docker image that will be deployed. Supported versions for tessera."},
             "tm_tls": { "type": "string","enum":["strict","off"],"description":"Options are strict and off. This enables TLS for the transaction managers, and is not related to the actual Quorum network. off is not recommended for production."},
             "tm_trust": { "type": "string","enum": ["ca-or-tofu","ca","tofu"],"description":"This is the trust relationships for the transaction managers."},
             "tm_nodes":{},
@@ -879,18 +885,6 @@
             "genesis":  { "type": "string","pattern":"^(\/[^\/ ]*)+[^\/ ]+$","description":"This is the path where genesis.json will be stored for a new network; for adding new node, the existing network's genesis.json should be available in json format in this file."},
             "bootnode": { "$ref":"#/definitions/quorum_config_bootnode"}
             },
-            "if": {"properties": { "transaction_manager": { "const": "tessera" } } },"then":{
-              "properties": {
-                "tm_version": { "type": "string","enum": ["21.7.3"],"description":"This is the version of transaction manager docker image that will be deployed. Supported versions: 1.6.0 for orion and 21.1.1 for tessera and orion."},
-                "tm_nodes": { "type":"array","minItems": 1,
-                    "items":{"type":"string","pattern":"^https:\/\/(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9](?::[0-9]{2,5})?$" }}
-              }},"else":{
-              "properties": {
-                "tm_version": { "type": "string","enum": ["0.3.2"],"description":"This is the version of transaction manager docker image that will be deployed. Supported versions: 1.6.0 for orion and 21.1.1 for tessera and orion."},
-                "tm_nodes": { "type":"array","minItems": 1,
-                    "items":{"type":"string","pattern":"^https:\/\/(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9](?::[0-9]{2,5})?$" }}
-
-            }},
           "required": [ "consensus","subject","transaction_manager","tm_version","tm_tls","tm_trust","tm_nodes","genesis"],
           "additionalProperties": false
         },
@@ -923,7 +917,7 @@
             "type":{"type":"string","enum":["validator","member","non-validator"],"description":"value can be validator or non-validator, only applicable if consensus = 'ibft'"},
             "geth_passphrase": { "type": "string", "description": "This is the passphrase used to generate the geth account."},
             "p2p":  { "$ref":"#/definitions/shared_port_ambassador"},
-            "rpc":  { "$ref":"#/definitions/shared_port_ambassador"},
+            "rpc":  { "$ref":"#/definitions/shared_port"},
             "transaction_manager":  { "$ref":"#/definitions/quorum_tm_port_ambassador"},
             "raft": { "$ref":"#/definitions/shared_port_ambassador","description":"Only used if consensus = 'raft'"},
             "db": { "$ref":"#/definitions/shared_port","description":" Only used if transaction_manager = tessera"}

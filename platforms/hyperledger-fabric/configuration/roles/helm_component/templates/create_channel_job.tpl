@@ -15,15 +15,16 @@ spec:
         kind: GitRepository
         name: flux-{{ network.env.type }}
         namespace: flux-{{ network.env.type }}
-      chart: {{ charts_dir }}/create_channel   
+      chart: {{ charts_dir }}/fabric-channel-create   
   values:
     metadata:
       namespace: {{ component_ns }}
       network:
-        version {{ network.version }}
+        version: {{ network.version }}
       images:
-        fabrictools: {{ fabrictools_image }}
-        alpineutils: {{ alpine_image }}
+        fabrictools: {{ docker_url }}/{{ fabric_tools_image[network.version] }}
+        alpineutils: {{ docker_url }}/{{ alpine_image }}
+
     peer:
       name: {{ peer_name }}
       address: {{ peer_name }}.{{ component_ns }}:7051

@@ -10,7 +10,7 @@ spec:
   interval: 1m
   chart:
    spec:
-    chart: {{ charts_dir }}/node_besu
+    chart: {{ charts_dir }}/besu-member-node
     sourceRef:
       kind: GitRepository
       name: flux-{{ network.env.type }}
@@ -33,9 +33,9 @@ spec:
 {% if network.env.proxy == 'ambassador' %}
     proxy:
       provider: ambassador
-      external_url: {{ name }}.{{ external_url }}
+      external_url: {{ external_url }}
       p2p: {{ peer.p2p.ambassador }}
-      rpc: {{ peer.rpc.ambassador }}
+      rpc: {{ peer.rpc.ambassador | default(80) }}
 {% else %}
     proxy:
       provider: none

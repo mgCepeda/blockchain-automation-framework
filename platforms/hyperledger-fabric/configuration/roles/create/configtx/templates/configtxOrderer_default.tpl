@@ -4,7 +4,14 @@ Orderer: &OrdererDefaults
 {% else %}
   OrdererType: {{ consensus.name }}
 {% endif %}
-
+  Addresses:
+{% for orderer in orderers %}
+{% if provider == 'none' %}
+    - {{ orderer.name }}.{{ orderer.org_name | lower }}-net:7050
+{% else %}
+    - {{ orderer.uri }}
+{% endif %}
+{% endfor %}
   BatchTimeout: 2s
   BatchSize:
     MaxMessageCount: 10
