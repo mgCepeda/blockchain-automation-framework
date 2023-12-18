@@ -10,7 +10,7 @@
     path: "{{ build_path }}/{{ org.name }}/{{ peer.name }}/enode"
   register: file_status
 
-# This task creates the build directory if it does not exist
+# Creates the build directory if it does not exist
 - name: Create build directory if it does not exist
   file:
     path: "{{ build_path }}/{{ org.name }}/{{ peer.name }}"
@@ -24,8 +24,8 @@
   shell: |
     vault kv get -field=key_pub {{ vault.secret_path | default('secretsv2') }}/{{ org.name }}-bes/crypto/{{ peer.name }}/data | sed -r 's/^.{2}//' > {{ build_path }}/{{ org.name }}/{{ peer.name }}/enode
   environment:
-    VAULT_ADDR: "{{ vault.url }}"
-    VAULT_TOKEN: "{{ vault.root_token }}"
+    VAULT_ADDR: "{{ org.vault.url }}"
+    VAULT_TOKEN: "{{ org.vault.root_token }}"
   when: file_status.stat.exists == False
 
 # Get enode data

@@ -15,6 +15,7 @@
   gather_facts: no
   no_log: "{{ no_ansible_log | default(false) }}"
   tasks:
+  # Setup flux
   - include_role:
       name:  setup/flux
     vars:
@@ -32,6 +33,8 @@
       flux_version: "0.35.0"
     with_items: "{{ network.organizations }}"
     when: network.env.type != 'operator'
+
+  # Prepare ports for Indy
   - name: Prepare nodes and clients ports for ambassador
     vars:
       name: "{{ organizationItem.name }}"
@@ -41,15 +44,19 @@
     loop_control:
       loop_var: organizationItem
     when: organizationItem.services.stewards is defined and network['type'] == 'indy'
+
+  # Setup ambassador edge stack (enabled for besu and quorum)
   - include_role:
-      name: setup/ambassador
+      name: setup/edge-stack
     vars:
       kubeconfig_path: "{{ item.k8s.config_file }}"
       kubecontext: "{{ item.k8s.context }}"
       aws: "{{ item.aws }}"
       organization: "{{ item }}"
     with_items: "{{ network.organizations }}"
-    when: network.env.proxy == 'ambassador'
+    when: 
+    - network.env.proxy == 'ambassador' 
+
   # Installs cert-manager
   - include_role:
       name: setup/certmanager
@@ -62,6 +69,8 @@
     when: 
       - network.env.proxy == 'ambassador'
       - network.type == 'besu'
+
+  # Setup haproxy-ingress for Fabric
   - include_role:
       name: setup/haproxy-ingress
     vars:
@@ -70,6 +79,8 @@
       aws: "{{ item.aws }}"
     with_items: "{{ network.organizations }}"
     when: network.env.proxy == 'haproxy'
+
+  # Setup istio for Fabric Operator
   - include_role:
       name: setup/istio
     vars:
@@ -79,6 +90,7 @@
     with_items: "{{ network.organizations }}"
     when: network.env.proxy == 'istio'
 
+  # Setup Fabric Operator
   - name: Setup bevel-operator-fabric for each organization
     include_role:
       name: "setup/operator"
@@ -90,6 +102,17 @@
     when: 
     - network.type == 'fabric'
     - network.env.type == 'operator'
+
+  # Deploy prometheus server
+  - name: Deploy prometheus server
+    include_role:
+      name: setup/prometheus
+    vars:
+      prometheus_port: "{{ network.prometheus.port }}"
+    when: 
+    - network.prometheus is defined and network.prometheus.enabled == true
+    - network.type == "besu"
+
   vars: #These variables can be overriden from the command line
     privilege_escalate: false           #Default to NOT escalate to root privledges
     install_os: "linux"                 #Default to linux OS

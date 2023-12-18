@@ -15,7 +15,7 @@ spec:
         kind: GitRepository
         name: flux-{{ network.env.type }}
         namespace: flux-{{ network.env.type }}
-      chart: {{ charts_dir }}/external_chaincode  
+      chart: {{ charts_dir }}/fabric-external-chaincode  
   values:
     metadata:
       namespace: {{ chaincode_ns }}
@@ -23,7 +23,7 @@ spec:
         version: {{ network.version }}
       images:
         external_chaincode: {{ chaincode_image }}
-        alpineutils: {{ alpine_image }}
+        alpineutils: {{ docker_url }}/{{ alpine_image }}
 
     chaincode:
       name: {{ chaincode.name }}

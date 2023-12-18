@@ -15,15 +15,14 @@ spec:
         kind: GitRepository
         name: flux-{{ network.env.type }}
         namespace: flux-{{ network.env.type }}
-      chart: {{ charts_dir }}/generate_cacerts
+      chart: {{ charts_dir }}/fabric-cacerts-gen
   values:
     metadata:
       name: {{ component }}
       component_name: {{ component }}-net
       namespace: {{ component_ns }}    
       images:
-        alpineutils: {{ alpine_image }}
-
+       alpineutils: {{ docker_url }}/{{ alpine_image }}
     vault:
       role: vault-role
       address: {{ vault.url }}

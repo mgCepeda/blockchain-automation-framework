@@ -7,7 +7,8 @@
 ##############################################################################################
 # This role creates the value file for doorman
 ##############################################################################################
-    
+
+# Wait for namespace creation
 - name: "Wait for namespace creation for {{ organisation }}"
   include_role:
     name: "{{ playbook_dir }}/../../shared/configuration/roles/check/k8_component"
@@ -32,7 +33,7 @@
     vault: "{{ item.vault }}"
     gitops: "{{ item.gitops }}"
 
-# generate Doorman certificates
+# Generate Doorman certificates
 - name: "Create certificates for doorman" 
   include_role: 
     name: create/certificates/doorman
@@ -58,7 +59,7 @@
     component_auth: "corda{{ services.doorman.name | lower }}"
     org: "{{ item }}"
     release_dir: "{{ playbook_dir }}/../../../{{ gitops.release_dir }}"
-    chart: "mongodb"
+    chart: "corda-mongodb"
   when: services.doorman.tls == 'off'
 
 # Create deployment file for doorman mongodb node when tls is on
@@ -75,7 +76,7 @@
     component_auth: "corda{{ services.doorman.name | lower }}"
     org: "{{ item }}"
     release_dir: "{{ playbook_dir }}/../../../{{ gitops.release_dir }}"
-    chart: "mongodb-tls"
+    chart: "corda-mongodb-tls"
   when: services.doorman.tls == 'on'
 
 # create deployment file for doorman node
@@ -91,7 +92,7 @@
     component_auth: "corda{{ services.doorman.name | lower }}"
     org: "{{ item }}"
     release_dir: "{{ playbook_dir }}/../../../{{ gitops.release_dir }}"
-    chart: "doorman"
+    chart: "corda-doorman"
     chart_tls: "false"
   when: services.doorman.tls == 'off'
 
@@ -108,7 +109,7 @@
     component_auth: "corda{{ services.doorman.name | lower }}"
     org: "{{ item }}"
     release_dir: "{{ playbook_dir }}/../../../{{ gitops.release_dir }}"
-    chart: "doorman-tls"
+    chart: "corda-doorman-tls"
     chart_tls: "true"
   when: services.doorman.tls == 'on'
 

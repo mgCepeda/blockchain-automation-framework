@@ -71,9 +71,9 @@ The [values.yaml](https://github.com/hyperledger/bevel/blob/develop/platforms/hy
 
 | Name                  | Description                                                    | Default Value                         |
 | ----------------------| ---------------------------------------------------------------| --------------------------------------|
-| namespace             | Provide the namespace for organization's Zookeeper and Kafka   | example-com                           |
-| images.kafka          | Valid image name and version for Fabric Kafka                  | hyperledger/fabric-kafka:0.4.18       |
-| images.zookeeper      | Valid image name and version for Fabric Zookeeper              | hyperledger/fabric-zookeeper:0.4.18   |
+| namespace             | Provide the namespace for organization's Zookeeper and Kafka   | org1-net                           |
+| images.kafka          | Valid image name and version for Fabric Kafka                  | ghcr.io/hyperledger/bevel-fabric-kafka:0.4.18       |
+| images.zookeeper      | Valid image name and version for Fabric Zookeeper              | ghcr.io/hyperledger/bevel-fabric-kafka:0.4.18   |
 | images.healthcheck    | Valid image name and version for Zookeeper health check        | busybox                               |
 | labels                | Custom labels for the deployment                               | ""                                    |
 
@@ -88,7 +88,7 @@ The [values.yaml](https://github.com/hyperledger/bevel/blob/develop/platforms/hy
 | Name              | Description                     | Default Value  |
 | ------------------| --------------------------------| ---------------|
 | storagesize       | Storagesize for storage class   | 512Mi          |
-| storageclassname  | Storageclassname for orderer    | aws-storage    |
+| storageclassname  | Storageclassname for orderer    | aws-storageclass    |
 
 ### Kafka
 

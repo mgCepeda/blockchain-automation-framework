@@ -6,15 +6,15 @@
 
 metadata:
   #Provide the namespace for organization's zookeeper and kafka
-  #Eg. namespace: example-com
-  namespace: example-com
+  #Eg. namespace: org1-net
+  namespace: org1-net
   images:  
     #Provide the valid image name and version for fabric kafka 
     #Eg. kafka: hyperledger/fabric-kafka:0.4.14
-    kafka: hyperledger/fabric-kafka:0.4.18
+    kafka: ghcr.io/hyperledger/bevel-fabric-kafka:0.4.18
     #Provide the valid image name and version for fabric zookeeper 
     #Eg. zookeeper: hyperledger/fabric-zookeeper:0.4.14
-    zookeeper: hyperledger/fabric-zookeeper:0.4.18
+    zookeeper: ghcr.io/hyperledger/bevel-fabric-zookeeper:0.4.18
     #Provide the valid image name and version for healthcheck of zookeeper
     #Eg. healthcheck: busybox
     healthcheck: busybox
@@ -33,7 +33,7 @@ storage:
   storagesize: 512Mi
   #Provide the storageclassname for orderer
   #Eg. storageclassname: aws-storage
-  storageclassname: aws-storage
+  storageclassname: aws-storageclass
 
 kafka:
   #Provide the name for kafka 

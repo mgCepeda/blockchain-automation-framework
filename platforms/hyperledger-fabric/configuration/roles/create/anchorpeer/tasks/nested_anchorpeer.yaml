@@ -36,15 +36,13 @@
     charts_dir: "{{ org.gitops.chart_source }}"
     vault: "{{ org.vault }}"
     k8s: "{{ org.k8s }}"
-    fabrictools_image: "hyperledger/fabric-tools:{{ network.version }}"
-    alpine_image: "{{ docker_url }}/alpine-utils:1.0"
     anchorstx: "{{ lookup('file', '{{ build_path }}/channel-artifacts/{{item.channel_name|lower}}{{participant.name|lower}}MSPAnchor.tx.base64') }}"
     values_dir: "{{playbook_dir}}/../../../{{org.gitops.release_dir}}/{{ org.name | lower }}"
   loop: "{{ participant.peers }}"
   loop_control:
     loop_var: peer
 
-#Git Push : Pushes the above generated files to git directory 
+# Git Push : Pushes the above generated files to git directory 
 - name: Git Push
   include_role: 
     name: "{{ playbook_dir }}/../../shared/configuration/roles/git_push"

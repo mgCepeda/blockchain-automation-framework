@@ -15,7 +15,7 @@ spec:
         kind: GitRepository
         name: flux-{{ network.env.type }}
         namespace: flux-{{ network.env.type }}
-      chart: {{ charts_dir }}/ca    
+      chart: {{ charts_dir }}/fabric-ca-server   
   values:
 {% if network.env.annotations is defined %}
     deployment:
@@ -42,8 +42,8 @@ spec:
     metadata:
       namespace: {{ component_name | e }}
       images:
-        alpineutils: {{ alpine_image }}
-        ca: {{ ca_image }}
+        alpineutils: {{ docker_url }}/{{ alpine_image }}
+        ca: {{ docker_url }}/{{ ca_image[network.version] }}
     server:
       name: {{ component_services.ca.name }}
       tlsstatus: true
@@ -67,7 +67,7 @@ spec:
       secretadminpass: {{ vault.secret_path | default('secretsv2') }}/data/credentials/{{ component_name | e }}/ca/{{ component }}?user
       serviceaccountname: vault-auth
       type: {{ vault.type | default("hashicorp") }}
-{% if network.docker.username is defined and network.docker.password is defined %}
+{% if network.docker.username is defined and network.docker.password is defined  %}
       imagesecretname: regcred
 {% else %}
       imagesecretname: ""
@@ -76,7 +76,7 @@ spec:
       servicetype: ClusterIP
       ports:
         tcp:
-          port: {{ component_services.ca.grpc.port }}
+          clusteripport: {{ component_services.ca.grpc.port }}
 {% if component_services.ca.grpc.nodePort is defined %}
           nodeport: {{ component_services.ca.grpc.nodePort }}
 {% endif %}

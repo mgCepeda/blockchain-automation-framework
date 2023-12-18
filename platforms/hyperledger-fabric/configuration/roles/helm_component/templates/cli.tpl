@@ -15,13 +15,13 @@ spec:
         kind: GitRepository
         name: flux-{{ network.env.type }}
         namespace: flux-{{ network.env.type }}
-      chart: {{ charts_dir }}/fabric_cli    
+      chart: {{ charts_dir }}/fabric-cli    
   values:
     metadata:
       namespace: {{ component_ns }}
       images:
-        fabrictools: {{ fabrictools_image }}
-        alpineutils: {{ alpine_image }}
+        fabrictools: {{ docker_url }}/{{ fabric_tools_image[network.version] }}
+        alpineutils: {{ docker_url }}/{{ alpine_image }}
     storage:
       class: {{ sc_name }}
       size: 256Mi
