@@ -15,18 +15,7 @@
   vars:
     component_type: "Namespace"
     component_name: "{{ component_ns }}"
-    type: "retry"
-
-# Wait for vault-auth creation
-- name: "Wait for vault-auth creation for {{ organisation }}"
-  include_role:
-    name: "{{ playbook_dir }}/../../shared/configuration/roles/check/k8_component"
-  vars:
-    component_type: "ServiceAccount"
-    component_name: "vault-auth"
-    type: "retry"
-  tags:
-    - notest    
+    type: "retry"    
 
 # Wait for vault-reviewer creation
 - name: "Wait for vault-reviewer creation for {{ organisation }}"
@@ -37,17 +26,6 @@
     component_name: "vault-reviewer"
     type: "retry"
   tags:
-    - notest    
-
-# Wait for ClusterRoleBinding creation
-- name: "Wait for ClusterRoleBinding creation for {{ organisation }}"
-  include_role:
-    name: "{{ playbook_dir }}/../../shared/configuration/roles/check/k8_component"
-  vars:
-    component_type: "ClusterRoleBinding"
-    component_name: "{{ component_ns }}-role-tokenreview-binding"
-    type: "retry"
-  tags:
     - notest
 
 # create vault access policies
@@ -56,7 +34,7 @@
     name: "{{ playbook_dir }}/../../shared/configuration/roles/setup/vault_kubernetes"
   vars:
     component_name: "{{ org.name | lower }}-vaultk8s-job"
-    component_auth: "cordaent{{ org.name | lower }}"
+    component_auth: "{{ network.env.type }}{{ org.name | lower }}"
     component_type: "{{ org.type | lower }}"
 
 # Create ambassador certificates for notary
