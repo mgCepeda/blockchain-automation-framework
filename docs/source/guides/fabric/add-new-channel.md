@@ -26,23 +26,17 @@ This guide explains how to add a new channel in a Hyperledger Fabric network usi
 
     - Edit the `network.yaml` file to include a new channel with the following details:
         - `channel_status: new`
-        - `org_status: existing`
         - Organization details (name, CA address, MSP ID, etc.)
 		- Orderer information
-    - Remove existing channels or use `channel_status: existing`
     - Refer to the [networkyaml-fabric.md](../networkyaml-fabric.md) guide for details on editing the configuration file.
 
     Snippet from `network.channels` section below:
 
     ```yaml
-    --8<-- "platforms/hyperledger-fabric/configuration/samples/network-fabric-add-new-channel.yaml:66:193"
+    --8<-- "platforms/hyperledger-fabric/configuration/samples/network-fabricv2.yaml:63:164"
     ```
 
-    !!! tip
-
-        For reference, see sample [network-fabric-add-channel.yaml](https://github.com/hyperledger/bevel/tree/main/platforms/hyperledger-fabric/configuration/samples/network-fabric-add-new-channel.yaml) file.
-
-1. **Run Playbook**
+2. **Run Playbook**
 
     Execute the following command to run the `add-new-channel.yaml` playbook:
 
