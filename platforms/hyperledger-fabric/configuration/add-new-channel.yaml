@@ -24,6 +24,15 @@
       file:
         path: "./build"
         state: absent
+    
+    - name: "Create genesis block"
+      include_role: 
+        name: "create/genesis"
+      vars:
+        org: "{{ network['organizations'] | first }}"
+        docker_url: "{{ network.docker.url }}"
+        kubernetes: "{{ org.k8s  }}"
+        generateGenisis: false
 
     # This role creates the value file for creating channel from creator organization
     # to the vault.
