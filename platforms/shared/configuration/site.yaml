@@ -9,9 +9,9 @@
 # Main Playbook for the setting up and reseting Hyperledger Bevel DLT network
 ##############################################################################
 
-# This playbook will validate the network yaml using ajv
-- import_playbook: validate-network-schema.yaml  
-  when: reset is undefined or reset == 'false'       
+# # This playbook will validate the network yaml using ajv
+# - import_playbook: validate-network-schema.yaml  
+#   when: reset is undefined or reset == 'false'       
 
 # Setup controller environment
 - import_playbook: setup-environment.yaml   
