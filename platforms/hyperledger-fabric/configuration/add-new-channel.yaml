@@ -33,7 +33,7 @@
         docker_url: "{{ network.docker.url }}"
         kubernetes: "{{ org.k8s  }}"
         generateGenisis: false
-      when: genererate_configtx == 'true'
+      when: genererate_configtx is defined and genererate_configtx == 'true'
 
     # This role creates the value file for creating channel from creator organization
     # to the vault.
@@ -75,4 +75,3 @@
     install_arch:  "amd64"              # Default to amd64 architecture
     bin_install_dir:  "~/bin"           # Default to /bin install directory for binaries
     add_new_org: 'false'                # Default to false as this is for main network creation
-    genererate_configtx: 'false'        # Default to false as this is for main network creation

@@ -74,7 +74,8 @@ kafka:
 {% endif %}
 
 channels:
-{% for channel in network.channels %}  
+{% for channel in network.channels %} 
+{% if channel.channel_status == 'new' %} 
   - name: {{ channel.channel_name | lower }}
     consortium: {{ channel.consortium }}
     orderers: 
@@ -85,6 +86,7 @@ channels:
 {% for participant in channel.participants %}
       - {{ participant.name | lower }}
 {% endfor %}
+{% endif %}
 {% endfor %}
 
 settings:

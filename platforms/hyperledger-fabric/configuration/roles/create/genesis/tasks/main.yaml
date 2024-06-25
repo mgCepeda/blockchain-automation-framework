@@ -6,6 +6,16 @@
 
 ############################################################################################
 
+
+# Remove all Helm releases of organization except genesis
+- name: Delete Helm releases
+  kubernetes.core.helm:
+    kubeconfig: "{{ kubernetes.config_file }}"
+    name: "genesis"
+    release_namespace: "{{ org.name | lower }}-net"
+    state: absent
+  when: genererate_configtx is defined and genererate_configtx == 'true'
+
 # Fetch peers cetificates
 - name: Fetch peers cetificates
   include_tasks: get_certificates.yaml

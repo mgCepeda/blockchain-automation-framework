@@ -1390,7 +1390,8 @@
             }
           },
           "required": [
-            "name"
+            "name",
+            "channel_status"
           ],
           "additionalProperties": false
         },
