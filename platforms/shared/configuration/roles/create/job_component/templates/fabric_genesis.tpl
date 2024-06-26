@@ -90,8 +90,6 @@ channels:
 {% endfor %}
 
 settings:
-  # Flag to generate the genesis file for Fabrix 2.2.x
   generateGenesis: {{ generateGenisisBLock }} 
-  # Flag to ensure the genesis configmap is removed on helm uninstall
-  removeConfigMapOnDelete: true
+  removeConfigMapOnDelete: false
 
