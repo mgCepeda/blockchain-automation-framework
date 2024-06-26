@@ -76,7 +76,7 @@ spec:
         - name: NETWORK_VERSION
           value: "{{ $.Values.metadata.network.version }}"
         {{- range $org := $.Values.endorsers.nameslist }}
-        - name: {{ $org.name | upper }}_ENDORSER_SECRET
+        - name: {{ $org.name | upper | replace "-" "_" }}_ENDORSER_SECRET
           valueFrom:
             secretKeyRef:
               name: {{ $org.name }}-endorser-cert
@@ -144,7 +144,7 @@ spec:
                 echo $OUTPUT_PATH
                 mkdir -p ${OUTPUT_PATH}/cacerts
 
-                var_name=$(echo "${name}_endorser_secret" | tr '[:lower:]' '[:upper:]')
+                var_name=$(echo "${name}_endorser_secret" | tr '[:lower:]' '[:upper:]' | tr '-' '_')
                 endorser_certificate=$(eval echo "\$$var_name")
                 echo $endorser_certificate | base64 -d >> ${OUTPUT_PATH}/cacerts/ca.crt
           
@@ -159,8 +159,8 @@ spec:
                       \"cacerts\": \"${CACERTS_FORMAT}\"
                     }  
                 }" > payload.json
-
-                SECRETPREFIX=${VAULT_SECRET_PATH}/data/crypto/peerOrganizations/${CREATOR_NS}/endorsers/${name}/users/admin
+                CREATOR_ORG=$(echo $CREATOR_NS | cut -d'-' -f1)
+                SECRETPREFIX=${VAULT_SECRET_PATH}/data/${CREATOR_ORG}/peerOrganizations/${CREATOR_NS}/endorsers/${name}/users/admin
                 vault_secret_key=${SECRETPREFIX}/msp
 
                 # This task write the CA server admin credentials to Vault

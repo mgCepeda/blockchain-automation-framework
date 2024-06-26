@@ -43,12 +43,12 @@ spec:
     vault:
       address: {{ vault.url }}
       secretengine: {{ vault.secret_path | default('secretsv2') }}
-      tmsecretpath: {{ component_ns }}/crypto/{{ peer.name }}/tm
-      secretprefix: {{ vault.secret_path | default('secretsv2') }}/data/{{ component_ns }}/crypto/{{ peer.name }}
+      tmsecretpath: {{ name }}/crypto/{{ peer.name }}/tm
+      secretprefix: {{ vault.secret_path | default('secretsv2') }}/data/{{ name }}/crypto/{{ peer.name }}
       serviceaccountname: vault-auth
       keyname: quorum
       role: vault-role
-      authpath: quorum{{ name }}
+      authpath: {{ network.env.type }}{{ name }}
       type: {{ vault.type | default("hashicorp") }}
     tessera:
       dburl: "jdbc:mysql://{{ peer.name }}-tessera:3306/demodb"

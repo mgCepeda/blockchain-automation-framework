@@ -32,13 +32,9 @@ spec:
     vault:
       role: vault-role
       address: {{ vault.url }}
-{% if org.k8s.cluster_id is defined %}
-      authpath: {{ org.k8s.cluster_id }}{{ namespace | e }}-auth
-{% else %}
-      authpath: {{ network.env.type }}{{ namespace | e }}-auth
-{% endif %}
-      adminsecretprefix: {{ vault.secret_path | default('secretsv2') }}/data/crypto/peerOrganizations/{{ namespace }}/users/admin 
-      orderersecretprefix: {{ vault.secret_path | default('secretsv2') }}/data/crypto/peerOrganizations/{{ namespace }}/orderer
+      authpath: {{ org.k8s.cluster_id | default('')}}{{ network.env.type }}{{ name }}
+      adminsecretprefix: {{ vault.secret_path | default('secretsv2') }}/data/{{ name }}/peerOrganizations/{{ namespace }}/users/admin 
+      orderersecretprefix: {{ vault.secret_path | default('secretsv2') }}/data/{{ name }}/peerOrganizations/{{ namespace }}/orderer
       serviceaccountname: vault-auth
       type: {{ vault.type | default("hashicorp") }}
 {% if network.docker.username is defined and network.docker.password is defined %}
@@ -57,6 +53,7 @@ spec:
       lang: {{ component_chaincode.lang | default('golang') }}
       commitarguments: {{ component_chaincode.arguments | default('') | quote }}
       endorsementpolicies:  {{ component_chaincode.endorsements | default('') | quote }}
+      initrequired: {{ component_chaincode.init_required | default('false') | quote }}
 {% if component_chaincode.repository is defined %}
       repository:
         hostname: "{{ component_chaincode.repository.url.split('/')[0] | lower }}"

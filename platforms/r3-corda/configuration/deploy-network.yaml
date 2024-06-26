@@ -26,7 +26,6 @@
     loop: "{{ network['organizations'] }}"
     loop_control:
       loop_var: org
-    when: network['type'] == 'corda'
 
   # Create Storageclass
   - name: Create StorageClass
@@ -34,18 +33,27 @@
       name: "{{ playbook_dir }}/../../../platforms/shared/configuration/roles/setup/storageclass"
     vars:
       org_name: "{{ org.name | lower }}"
-      cloudProvider: "{{ org.cloud_provider | lower }}"
-      sc_name: "{{ org_name }}-{{ cloudProvider }}-storageclass" 
+      sc_name: "{{ org_name }}-bevel-storageclass" 
       region: "{{ org.k8s.region | default('eu-west-1') }}"
-      git_dir: "{{ org.gitops.release_dir }}"
-      kubernetes: "{{ org.k8s }}"
-      gitops: "{{ org.gitops }}"
-      charts_dir: "platforms/shared/charts"
-      platform_suffix: "ns" 
     loop: "{{ network['organizations'] }}"
     loop_control:
       loop_var: org
-    when: network['type'] == 'corda'
+
+  # Setup Vault-Kubernetes accesses
+  - name: "Setup vault Kubernetes accesses"
+    include_role:
+      name: "{{ playbook_dir }}/../../shared/configuration/roles/setup/vault_kubernetes"
+    vars:
+      name: "{{ item.name | lower }}"
+      org_name: "{{ item.name | lower }}"
+      component_ns: "{{ item.name | lower }}-ns"
+      component_name: "{{ item.name | lower }}-vaultk8s-job"
+      component_auth: "{{ network.env.type }}{{ name }}"
+      component_type: "organization"
+      kubernetes: "{{ item.k8s }}"
+      vault: "{{ item.vault }}"
+      gitops: "{{ item.gitops }}"
+    loop: "{{ network['organizations'] }}"
 
   # Deploy Doorman node
   - name: Deploy Doorman service node
@@ -53,14 +61,14 @@
       name: setup/doorman
     vars:
       services: "{{ item.services }}"
-      organisation: "{{ item.name | lower }}"
-      sc_name: "{{ organisation }}-{{ item.cloud_provider | lower }}-storageclass"
+      name: "{{ item.name | lower }}"
+      sc_name: "{{ name }}-bevel-storageclass"
       component_ns: "{{ item.name | lower }}-ns"
       kubernetes: "{{ item.k8s }}"
       vault: "{{ item.vault }}"
       gitops: "{{ item.gitops }}"     
     loop: "{{ network['organizations'] }}"
-    when: network['type'] == 'corda' and item.type.find('doorman') != -1
+    when: item.type.find('doorman') != -1
 
   # Deploy NMS node
   - name: Deploy Networkmap service node
@@ -68,14 +76,14 @@
       name: setup/nms      
     vars:
       services: "{{ item.services }}"
-      organisation: "{{ item.name | lower }}"
-      sc_name: "{{ organisation }}-{{ item.cloud_provider | lower }}-storageclass"
+      name: "{{ item.name | lower }}"
+      sc_name: "{{ name }}-bevel-storageclass"
       component_ns: "{{ item.name | lower }}-ns"
       kubernetes: "{{ item.k8s }}"
       vault: "{{ item.vault }}"
       gitops: "{{ item.gitops }}"
     loop: "{{ network['organizations'] }}"
-    when: network['type'] == 'corda' and item.type.find('nms') != -1
+    when: item.type.find('nms') != -1
   
   # Wait for network services to respond  
   - name: Check that network services uri are reachable
@@ -97,23 +105,23 @@
     vars:
       services: "{{ item.services }}"
       node: "{{ item.services.notary }}"
-      organisation: "{{ item.name | lower }}"
-      sc_name: "{{ organisation }}-{{ item.cloud_provider | lower }}-storageclass"
+      name: "{{ item.name | lower }}"
+      sc_name: "{{ name }}-bevel-storageclass"
       component_ns: "{{ item.name | lower }}-ns"
       kubernetes: "{{ item.k8s }}"
       vault: "{{ item.vault }}"
       gitops: "{{ item.gitops }}" 
       cordapps: "{{ item.cordapps | default() }}"
     loop: "{{ network['organizations'] }}"
-    when: network['type'] == 'corda' and item.type.find('notary') != -1
+    when: item.type.find('notary') != -1
 
   # Deploy all other nodes
   - name: 'Deploy nodes'
     include_role:
       name: setup/node
     vars:
-      organisation: "{{ item.name | lower }}"
-      sc_name: "{{ organisation }}-{{ item.cloud_provider | lower }}-storageclass"
+      name: "{{ item.name | lower }}"
+      sc_name: "{{ name }}-bevel-storageclass"
       component_ns: "{{ item.name | lower }}-ns"
       services: "{{ item.services }}"
       kubernetes: "{{ item.k8s }}"
@@ -121,4 +129,4 @@
       cordapps: "{{ item.cordapps | default() }}"
       gitops: "{{ item.gitops }}" 
     loop: "{{ network['organizations'] }}"  
-    when: network['type'] == 'corda' and item.type == 'node'
+    when: item.type == 'node'

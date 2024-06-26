@@ -20,7 +20,10 @@
     git_branch: "{{ item.gitops.branch }}"
     git_path: "{{ item.gitops.release_dir }}"
     git_host: "{{ item.gitops.git_repo.split('/')[0] | lower }}" # extract the hostname from the git_repo
-    ssh: "{{ item.gitops.ssh | default(false) }}"
+    git_protocol: "{{ item.gitops.git_protocol | default('https') }}"
+    git_url: "{{ item.gitops.git_url }}"
+    git_key: "{{ item.gitops.private_key | default() }}"
+    flux_version: "0.35.0"
     helm_operator_version: "1.2.0"
     aws_authenticator:
       os: "{{ install_os }}"
@@ -31,25 +34,22 @@
 # Setup ambassador for float cluster
 - name: Setup ambassador for float cluster
   include_role:
-    name: "{{ playbook_dir }}/../../shared/configuration/roles/setup/ambassador"
+    name: "{{ playbook_dir }}/../../shared/configuration/roles/setup/edge-stack"
   vars:
     item: "{{ org.services.float }}"
     kubeconfig_path: "{{ item.k8s.config_file }}"
     kubecontext: "{{ item.k8s.context }}"
     aws: "{{ item.aws }}"
-    ambassador:
-      item: "{{ org.services.float }}"
-  
+  when: network.env.proxy == 'ambassador'
+
 # Create Storageclass that will be used for this deployment
 - name: Create Storageclass
   include_role:
     name: "{{ playbook_dir }}/../../../platforms/shared/configuration/roles/setup/storageclass"
   vars:
     org_name: "{{ org.name | lower }}"
-    cloudProvider: "{{ org.cloud_provider | lower }}"
-    sc_name: "{{ org_name }}-{{ cloudProvider }}-storageclass"
+    sc_name: "{{ org_name }}-bevel-storageclass"
     kubernetes: "{{ org.services.float.k8s }}"
-    charts_dir: "platforms/shared/charts"
     gitops: "{{ org.services.float.gitops }}"
 
 # Create namespace, service account and clusterrolebinding
@@ -72,18 +72,6 @@
     kubernetes: "{{ org.services.float.k8s }}"
     type: "retry"
 
-# Wait for vault-auth creation
-- name: "Wait for vault-auth creation for {{ organisation }}"
-  include_role:
-    name: "{{ playbook_dir }}/../../shared/configuration/roles/check/k8_component"
-  vars:
-    component_type: "ServiceAccount"
-    component_name: "vault-auth"
-    kubernetes: "{{ org.services.float.k8s }}"
-    type: "retry"
-  tags:
-    - notest    
-
 # Wait for vault-reviewer creation
 - name: "Wait for vault-reviewer creation for {{ organisation }}"
   include_role:
@@ -95,15 +83,3 @@
     type: "retry"
   tags:
     - notest    
-
-# Wait for ClusterRoleBinding creation
-- name: "Wait for ClusterRoleBinding creation for {{ organisation }}"
-  include_role:
-    name: "{{ playbook_dir }}/../../shared/configuration/roles/check/k8_component"
-  vars:
-    component_type: "ClusterRoleBinding"
-    component_name: "{{ component_ns }}-role-tokenreview-binding"
-    kubernetes: "{{ org.services.float.k8s }}"
-    type: "retry"
-  tags:
-    - notest

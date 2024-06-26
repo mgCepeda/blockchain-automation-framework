@@ -10,8 +10,8 @@ metadata:
   name: {{ .Release.Name }}-cactus-connector
   namespace: {{ .Values.metadata.namespace }}
   labels:
+    app: {{ .Release.Name }}
     app.kubernetes.io/name: {{ .Release.Name }}-cactus-connector
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/instance: {{ .Release.Name }} 
     {{- include "labels.custom" . | nindent 2 }}
@@ -19,26 +19,26 @@ spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
+      app: {{ .Release.Name }}
       name: {{ .Release.Name }}-cactus-connector
       app.kubernetes.io/name: {{ .Release.Name }}-cactus-connector
-      helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
       app.kubernetes.io/managed-by: {{ .Release.Service }}
       app.kubernetes.io/instance: {{ .Release.Name }} 
       {{- include "labels.custom" . | nindent 2 }}
   template:
     metadata:
       labels:
+        app: {{ .Release.Name }}
         name: {{ .Release.Name }}-cactus-connector
         app.kubernetes.io/name: {{ .Release.Name }}-cactus-connector
-        helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
         app.kubernetes.io/managed-by: {{ .Release.Service }}
         app.kubernetes.io/instance: {{ .Release.Name }} 
         {{- include "labels.custom" . | nindent 2 }}
     spec:
       containers:
       - name: cactus-connector
-        image: {{ .Values.image.repository | quote }}
-        imagePullPolicy: {{ .Values.image.pullPolicy}}
+        image: "{{ .Values.image.repository }}{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - name: http
           containerPort: 4000
