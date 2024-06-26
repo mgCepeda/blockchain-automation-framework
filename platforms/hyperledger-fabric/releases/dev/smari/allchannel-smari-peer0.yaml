@@ -1,0 +1,33 @@
+global:
+  version: 2.5.4
+  serviceAccountName: vault-auth
+  cluster:
+    provider: azure
+    cloudNativeServices: false
+  vault:
+    type: hashicorp
+    network: fabric
+    address: http://98.64.226.131:20001
+    authPath: marismari
+    secretEngine: secretsv2
+    secretPrefix: "data/marismari"
+    role: vault-role
+    tls: false
+  proxy:
+    provider: haproxy
+    externalUrlSuffix: hlf.blockchaincloudpoc-develop.com
+
+image:
+  fabricTools: ghcr.io/hyperledger/bevel-fabric-tools
+  alpineUtils: ghcr.io/hyperledger/bevel-alpine:latest
+  pullSecret: ""
+
+peer:
+  name: peer0
+  type: anchor
+  address: peer0.smari-net.hlf.blockchaincloudpoc-develop.com:443
+  localMspId: smariMSP
+  logLevel: debug
+  tlsStatus: true
+  channelName: allchannel  
+  ordererAddress: orderer4.smari-net.hlf.blockchaincloudpoc-develop.com:443
