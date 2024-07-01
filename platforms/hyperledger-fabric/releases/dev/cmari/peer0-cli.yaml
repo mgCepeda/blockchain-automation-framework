@@ -17,7 +17,7 @@ global:
 image:
   fabricTools: ghcr.io/hyperledger/bevel-fabric-tools
   alpineUtils: ghcr.io/hyperledger/bevel-alpine:latest
-  imagesecretname: ""
+  pullSecret: ""
 
 peerName: peer0
 storageClass: storage-peer0
