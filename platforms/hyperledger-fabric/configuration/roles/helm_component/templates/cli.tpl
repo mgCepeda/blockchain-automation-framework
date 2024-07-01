@@ -22,6 +22,7 @@ spec:
       cluster:
         provider: {{ org.cloud_provider }}
         cloudNativeServices: false
+        kubernetesUrl: https://devcluster-devresourcegroup-d1d33f-kncld871.hcp.westeurope.azmk8s.io:443
       vault:
         type: hashicorp
         network: fabric
