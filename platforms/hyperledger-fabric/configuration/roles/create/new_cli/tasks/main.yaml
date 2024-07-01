@@ -58,12 +58,6 @@
   - peer.cli == "enabled"
   - existing_cli.resources|length == 0
 
-- debug:
-    var: org.name
-
-- pause:
-    minutes: 840
-
 # Git Push : Push the above generated files to git directory
 - name: Git Push
   include_role:
