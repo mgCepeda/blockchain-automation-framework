@@ -31,38 +31,12 @@
     loop_var: peer
   register: existing_cli
 
-# # Create the value file
-# - name: "Create Value file for CLI Pod"
-#   include_role:
-#     name: helm_component
-#   vars:
-#     name: "{{ org.name | lower}}"
-#     component: "{{ org.name | lower}}"
-#     component_name: "{{ peer.name | lower}}-cli"
-#     orderer: "{{ network.orderers | first }}"
-#     component_ns: "{{ org.name | lower}}-net"
-#     git_protocol: "{{ org.gitops.git_protocol }}"
-#     git_url: "{{ org.gitops.git_url }}"
-#     git_branch: "{{ org.gitops.branch }}"
-#     charts_dir: "{{ org.gitops.chart_source }}"
-#     vault: "{{ org.vault }}"
-#     values_dir: "{{playbook_dir}}/../../../{{org.gitops.release_dir}}/{{ org.name | lower }}"
-#     type: "cli"
-#   loop: "{{ peers }}"
-#   loop_control:
-#     loop_var: peer
-#   when:
-#   - peer.peerstatus is not defined or peer.peerstatus == 'new'
-#   - peer.cli is defined
-#   - peer.cli == "enabled"
-#   - existing_cli.resources|length == 0
-
 # Create the value file
 - name: "Create Value file for CLI Pod"
   include_role:
-    name:  "{{ playbook_dir }}/../../shared/configuration/roles/create/job_component"
+    name: helm_component
   vars:
-    name: "cli"
+    name: "{{ org.name | lower}}"
     component: "{{ org.name | lower}}"
     component_name: "{{ peer.name | lower}}-cli"
     orderer: "{{ network.orderers | first }}"
@@ -74,7 +48,6 @@
     vault: "{{ org.vault }}"
     values_dir: "{{playbook_dir}}/../../../{{org.gitops.release_dir}}/{{ org.name | lower }}"
     type: "cli"
-    kubernetes: "{{ org.k8s }}"
   loop: "{{ peers }}"
   loop_control:
     loop_var: peer
@@ -83,6 +56,33 @@
   - peer.cli is defined
   - peer.cli == "enabled"
   - existing_cli.resources|length == 0
+
+# # Create the value file
+# - name: "Create Value file for CLI Pod"
+#   include_role:
+#     name:  "{{ playbook_dir }}/../../shared/configuration/roles/create/job_component"
+#   vars:
+#     name: "cli"
+#     component: "{{ org.name | lower}}"
+#     component_name: "{{ peer.name | lower}}-cli"
+#     orderer: "{{ network.orderers | first }}"
+#     component_ns: "{{ org.name | lower}}-net"
+#     git_protocol: "{{ org.gitops.git_protocol }}"
+#     git_url: "{{ org.gitops.git_url }}"
+#     git_branch: "{{ org.gitops.branch }}"
+#     charts_dir: "{{ org.gitops.chart_source }}"
+#     vault: "{{ org.vault }}"
+#     values_dir: "{{playbook_dir}}/../../../{{org.gitops.release_dir}}/{{ org.name | lower }}"
+#     type: "cli"
+#     kubernetes: "{{ org.k8s }}"
+#   loop: "{{ peers }}"
+#   loop_control:
+#     loop_var: peer
+#   when:
+#   - peer.peerstatus is not defined or peer.peerstatus == 'new'
+#   - peer.cli is defined
+#   - peer.cli == "enabled"
+#   - existing_cli.resources|length == 0
 
 # Git Push : Push the above generated files to git directory
 - name: Git Push

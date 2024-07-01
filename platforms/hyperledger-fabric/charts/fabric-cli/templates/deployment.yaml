@@ -7,7 +7,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "fabric-cli.name" . }}
+  name: {{ template "fabric-cli.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
     app: cli

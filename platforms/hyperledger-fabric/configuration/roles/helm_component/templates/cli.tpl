@@ -37,9 +37,9 @@ spec:
       fabricTools: {{ docker_url }}/{{ fabric_tools_image }}
       alpineUtils: {{ docker_url }}/bevel-alpine:{{ bevel_alpine_version }}
 {% if network.docker.username is defined and network.docker.password is defined %}
-      imagesecretname: regcred
+      pullSecret: regcred
 {% else %}
-      imagesecretname: ""
+      pullSecret: ""
 {% endif %}
 
     peerName: {{ peer.name }}
