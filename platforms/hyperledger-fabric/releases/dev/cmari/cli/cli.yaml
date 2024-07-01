@@ -1,0 +1,49 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cli
+  namespace: cmari-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  interval: 1m
+  releaseName: cli
+  chart:
+    spec:
+      interval: 1m
+      sourceRef:
+        kind: GitRepository
+        name: flux-mari
+        namespace: flux-mari
+      chart: platforms/hyperledger-fabric/charts/fabric-cli    
+  values:
+    global:
+      serviceAccountName: vault-auth
+      cluster:
+        provider: azure
+        cloudNativeServices: false
+      vault:
+        type: hashicorp
+        network: fabric
+        address: http://98.64.226.131:20001
+        authPath: maricmari
+        secretEngine: secretsv2
+        secretPrefix: "data/maricmari"
+        role: vault-role
+        tls: false
+
+    image:
+      fabricTools: ghcr.io/hyperledger/bevel-fabric-tools
+      alpineUtils: ghcr.io/hyperledger/bevel-alpine:latest
+      imagesecretname: ""
+
+    peerName: peer0
+    storageClass: storage-peer0
+    storageSize: 256Mi
+    localMspId: cmariMSP
+    tlsStatus: true
+    ports:
+      grpc:
+        clusterIpPort: 7051
+    ordererAddress: orderer4.smari-net.hlf.blockchaincloudpoc-develop.com:443
+

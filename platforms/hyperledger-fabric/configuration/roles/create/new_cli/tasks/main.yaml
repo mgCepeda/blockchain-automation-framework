@@ -38,7 +38,7 @@
   vars:
     name: "cli"
     component: "{{ org.name | lower}}"
-    component_name: "{{ peer.name | lower}}-cli"
+    component_name: "cli"
     orderer: "{{ network.orderers | first }}"
     component_ns: "{{ org.name | lower}}-net"
     git_protocol: "{{ org.gitops.git_protocol }}"
