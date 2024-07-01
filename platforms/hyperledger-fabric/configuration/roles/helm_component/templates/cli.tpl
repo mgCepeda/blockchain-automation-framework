@@ -42,6 +42,7 @@ spec:
 {% endif %}
 
     peerName: {{ peer.name }}
+    storageClass: storage-{{ peer.name }}
     storageSize: 256Mi
     localMspId: {{ org.name | lower}}MSP
     tlsStatus: true

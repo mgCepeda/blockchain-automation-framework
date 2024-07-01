@@ -38,6 +38,7 @@ spec:
       imagesecretname: ""
 
     peerName: peer0
+    storageClass: storage-peer0
     storageSize: 256Mi
     localMspId: cmariMSP
     tlsStatus: true
