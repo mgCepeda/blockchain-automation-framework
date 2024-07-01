@@ -37,7 +37,8 @@
     name: helm_component
   vars:
     name: "cli"
-    component_name: "{{ peer.name | lower}}-{{ org.name | lower }}-cli"
+    component: "{{ org.name | lower}}"
+    component_name: "{{ peer.name | lower}}-cli"
     orderer: "{{ network.orderers | first }}"
     component_ns: "{{ org.name | lower}}-net"
     git_protocol: "{{ org.gitops.git_protocol }}"
@@ -45,7 +46,6 @@
     git_branch: "{{ org.gitops.branch }}"
     charts_dir: "{{ org.gitops.chart_source }}"
     vault: "{{ org.vault }}"
-    sc_name: "{{ org.name | lower }}-bevel-storageclass"
     values_dir: "{{playbook_dir}}/../../../{{org.gitops.release_dir}}/{{ org.name | lower }}"
     type: "cli"
     external_url_suffix: "{{ org.external_url_suffix }}"
@@ -57,6 +57,12 @@
   - peer.cli is defined
   - peer.cli == "enabled"
   - existing_cli.resources|length == 0
+
+- debug:
+    var: org.name
+
+- pause:
+    minutes: 840
 
 # Git Push : Push the above generated files to git directory
 - name: Git Push
