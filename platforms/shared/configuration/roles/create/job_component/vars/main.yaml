@@ -17,6 +17,7 @@ job_templates:
   indy_endorser: indy_endorser.tpl
   corda_ent_init: corda_ent_init.tpl
   corda_ent_cenm: corda_ent_cenm.tpl
+  cli: cli.tpl
 charts:
   primary_genesis: "{{ network.type }}-genesis"
   secondary_genesis: "{{ network.type }}-genesis"
@@ -26,6 +27,7 @@ charts:
   osn_create_channel_job: fabric-osnadmin-channel-create
   create_channel_job: fabric-channel-create
   join_channel_job: fabric-channel-join
+  cli: fabric-cli
 
 bevel_alpine_version: latest
 fabric_tools_image: bevel-fabric-tools
