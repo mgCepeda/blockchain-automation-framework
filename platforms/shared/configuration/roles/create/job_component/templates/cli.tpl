@@ -1,4 +1,5 @@
 global:
+  version: {{ network.version }}
   serviceAccountName: vault-auth
   cluster:
     provider: {{ org.cloud_provider }}

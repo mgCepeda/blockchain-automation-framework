@@ -18,6 +18,7 @@ spec:
       chart: {{ charts_dir }}/fabric-cli    
   values:
     global:
+      version: {{ network.version }}
       serviceAccountName: vault-auth
       cluster:
         provider: {{ org.cloud_provider }}
