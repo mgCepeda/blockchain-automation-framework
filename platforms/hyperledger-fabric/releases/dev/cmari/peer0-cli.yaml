@@ -1,4 +1,5 @@
 global:
+  version: 2.2.2
   serviceAccountName: vault-auth
   cluster:
     provider: azure
