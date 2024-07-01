@@ -11,18 +11,24 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     app: cli
-    app.kubernetes.io/name: {{ .Release.Name }}
-    app.kubernetes.io/component: fabric
-    app.kubernetes.io/instance: {{ .Release.Name }} 
+    app.kubernetes.io/name: {{ include "fabric-cli.name" . }}-job
+    app.kubernetes.io/component: cli
+    app.kubernetes.io/part-of: {{ include "fabric-cli.fullname" . }}
+    app.kubernetes.io/namespace: {{ .Release.Namespace }}
+    app.kubernetes.io/release: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: helm
     {{ include "labels.deployment" . | nindent 4 }}
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: cli
-      app.kubernetes.io/name: {{ .Release.Name }}
-      app.kubernetes.io/component: fabric
-      app.kubernetes.io/instance: {{ .Release.Name }} 
+      app.kubernetes.io/name: {{ include "fabric-cli.name" . }}-job
+      app.kubernetes.io/component: cli
+      app.kubernetes.io/part-of: {{ include "fabric-cli.fullname" . }}
+      app.kubernetes.io/namespace: {{ .Release.Namespace }}
+      app.kubernetes.io/release: {{ .Release.Name }}
+      app.kubernetes.io/managed-by: helm
   template:
     metadata:
       labels:
