@@ -56,3 +56,6 @@
     ORDERER_CA: "/opt/gopath/src/github.com/hyperledger/fabric/crypto/orderer/tls/ca.crt"
   vars: 
     kubernetes: "{{ org.k8s }}"
+
+- pause:
+    minutes: 840

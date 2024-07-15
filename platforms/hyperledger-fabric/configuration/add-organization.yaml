@@ -97,14 +97,14 @@
       loop: "{{ network['organizations'] }}"
       when: item.services.ca is defined and item.org_status == 'new'
 
-    # Create generate_crypto script for new organization
-    - include_role:
-        name: "create/crypto_script"
-      vars:
-        component_type: "{{ item.type | lower}}"
-        orderers: "{{ item.services.orderers }}"
-      loop: "{{ network['organizations'] }}"
-      when: item.org_status == 'new'
+    # # Create generate_crypto script for new organization
+    # - include_role:
+    #     name: "create/crypto_script"
+    #   vars:
+    #     component_type: "{{ item.type | lower}}"
+    #     orderers: "{{ item.services.orderers }}"
+    #   loop: "{{ network['organizations'] }}"
+    #   when: item.org_status == 'new'
 
     #Creating a pause so that the client certificates are valid
     # You can continue if the CA-server pods are running for more than 5 minutes
@@ -142,25 +142,25 @@
       loop: "{{ network['organizations'] }}"
       when: item.type == 'peer' and item.org_status == 'new'
 
-    # Creating channel artifacts and putting them in vault
-    # This role creates configtx.yaml file as the requirements mentioned in network.yaml
-    # which is then consumed by configtxgen tool
-    - include_role:
-        name: "create/configtx"
-      vars:
-        config_file: "./build/configtx.yaml"
+    # # Creating channel artifacts and putting them in vault
+    # # This role creates configtx.yaml file as the requirements mentioned in network.yaml
+    # # which is then consumed by configtxgen tool
+    # - include_role:
+    #     name: "create/configtx"
+    #   vars:
+    #     config_file: "./build/configtx.yaml"
 
-    # This role generate genesis block and channeltx
-    # Generates the config.json from the configtx.yaml for new organization
-    - include_role:
-        name: "create/channel_artifacts"
-      vars:
-        build_path: "./build"
-        genesis: "{{ item.genesis }}"
-        channel_name: "{{ item.channel_name | lower}}"
-        fetch_certs: "false"
-        profile_name: "{{ item.channel_name }}"
-      loop: "{{ network['channels'] }}"
+    # # This role generate genesis block and channeltx
+    # # Generates the config.json from the configtx.yaml for new organization
+    # - include_role:
+    #     name: "create/channel_artifacts"
+    #   vars:
+    #     build_path: "./build"
+    #     genesis: "{{ item.genesis }}"
+    #     channel_name: "{{ item.channel_name | lower}}"
+    #     fetch_certs: "false"
+    #     profile_name: "{{ item.channel_name }}"
+    #   loop: "{{ network['channels'] }}"
 
     # This role creates the value file for peers of organisations and write couch db credentials
     # to the vault.
