@@ -123,3 +123,6 @@
 - name: Display configtx file contents
   debug: 
     msg: "The configtx file is: {{ lookup('file', './build/configtx.yaml') }}"
+
+- pause:
+    minutes: 840
