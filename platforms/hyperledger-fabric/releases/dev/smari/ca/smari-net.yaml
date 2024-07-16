@@ -1,0 +1,51 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: smari-net-ca
+  namespace: smari-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  interval: 1m
+  releaseName: smari-net-ca
+  chart:
+    spec:
+      interval: 1m
+      sourceRef:
+        kind: GitRepository
+        name: flux-mar
+        namespace: flux-mar
+      chart: platforms/hyperledger-fabric/charts/fabric-ca-server   
+  values:
+    metadata:
+      namespace: smari-net
+      images:
+        alpineutils: ghcr.io/hyperledger/bevel-alpine:latest
+        ca: ghcr.io/hyperledger/bevel-fabric-ca:latest
+    server:
+      name: ca
+      tlsstatus: true
+      admin: smari-admin
+        
+    storage:
+      storageclassname: smari-bevel-storageclass
+      storagesize: 512Mi 
+    vault:
+      role: vault-role
+      address: http://98.64.226.131:20001
+      authpath: marsmari
+      secretcert: secretsv2/data/smari/ordererOrganizations/smari-net/ca?ca.smari-net-cert.pem
+      secretkey: secretsv2/data/smari/ordererOrganizations/smari-net/ca?smari-net-CA.key
+      secretadminpass: secretsv2/data/smari/credentials/smari-net/ca/smari?user
+      serviceaccountname: vault-auth
+      type: hashicorp
+      imagesecretname: ""
+    service:
+      servicetype: ClusterIP
+      ports:
+        tcp:
+          clusteripport: 7054
+    proxy:
+      provider: haproxy
+      type: orderer
+      external_url_suffix: hlf.blockchaincloudpoc-develop.com
