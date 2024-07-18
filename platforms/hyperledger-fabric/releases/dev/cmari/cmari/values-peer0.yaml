@@ -1,0 +1,81 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cmari-peer0
+  namespace: cmari-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  interval: 1m
+  releaseName: cmari-peer0
+  chart:
+    spec:
+      interval: 1m
+      sourceRef:
+        kind: GitRepository
+        name: flux-mar
+        namespace: flux-mar
+      chart: platforms/hyperledger-fabric/charts/fabric-peernode    
+  values:
+    metadata:
+      namespace: cmari-net
+      images:
+        couchdb:  ghcr.io/hyperledger/bevel-fabric-couchdb:2.5.4
+        peer:  ghcr.io/hyperledger/bevel-fabric-peer:2.5.4
+        alpineutils: ghcr.io/hyperledger/bevel-alpine:latest
+
+        
+    peer:
+      name: peer0
+      gossippeeraddress: peer0.cmari-net.hlf.blockchaincloudpoc-develop.com:443
+      gossipexternalendpoint: peer0.cmari-net.hlf.blockchaincloudpoc-develop.com:443
+      localmspid: cmariMSP
+      loglevel: info
+      tlsstatus: true
+      builder: hyperledger/fabric-ccenv:2.5.4
+      couchdb:
+        username: cmari-user
+
+    storage:
+      peer:
+        storageclassname: cmari-bevel-storageclass
+        storagesize: 512Mi
+      couchdb:
+        storageclassname: cmari-bevel-storageclass
+        storagesize: 1Gi
+
+    vault:
+      role: vault-role
+      address: http://98.64.226.131:20001
+      authpath: marcmari
+      secretprefix: secretsv2/data/cmari/peerOrganizations/cmari-net/peers/peer0.cmari-net
+      serviceaccountname: vault-auth
+      type: hashicorp
+      imagesecretname: ""
+      secretcouchdbpass: secretsv2/data/cmari/credentials/cmari-net/couchdb/cmari?user
+
+    service:
+      servicetype: ClusterIP
+      ports:
+        grpc:
+          clusteripport: 7051
+        events:
+          clusteripport: 7053
+        couchdb:
+          clusteripport: 5984
+        metrics: 
+          enabled: False
+          clusteripport: 9443     
+    proxy:
+      provider: "haproxy"
+      external_url_suffix: hlf.blockchaincloudpoc-develop.com
+
+    config:
+      pod:
+        resources:
+          limits:
+            memory: 512M
+            cpu: 1
+          requests:
+            memory: 512M
+            cpu: 0.25
