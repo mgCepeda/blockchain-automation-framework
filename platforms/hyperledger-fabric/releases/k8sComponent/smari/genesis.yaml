@@ -1,0 +1,63 @@
+global:
+  version: 2.5.4
+  serviceAccountName: vault-auth
+  cluster:
+    provider: aws
+    cloudNativeServices: false
+  vault:
+    type: hashicorp
+    network: fabric
+    address: http://vault.internal.dev.aws.blockchaincloudpoc-develop.com:20002
+    authPath: marismari
+    secretEngine: secretsv2
+    secretPrefix: "data/marismari"
+    role: vault-role
+    tls: false
+  proxy:
+    provider: haproxy
+    externalUrlSuffix: hlf.blockchaincloudpoc-develop.com
+
+image:
+  alpineUtils: ghcr.io/hyperledger/bevel-alpine:latest
+  fabricTools: ghcr.io/hyperledger/bevel-fabric-tools
+  pullSecret: ""
+
+organizations:
+  - name: smari
+    orderers:
+    - name: orderer1
+      ordererAddress: orderer1.smari-net.hlf.blockchaincloudpoc-develop.com:443
+    - name: orderer2
+      ordererAddress: orderer2.smari-net.hlf.blockchaincloudpoc-develop.com:443
+    peers:
+    - name: peer0
+      peerAddress: peer0.smari-net.hlf.blockchaincloudpoc-develop.com:443
+    - name: peer1
+      peerAddress: peer1.smari-net.hlf.blockchaincloudpoc-develop.com:443
+  - name: cmari
+    peers:
+    - name: peer0
+      peerAddress: peer0.cmari-net.hlf.blockchaincloudpoc-develop.com:443
+
+consensus: raft
+
+
+channels:
+ 
+ 
+  - name: allchannel
+    consortium: SupplyChainConsortium
+    orderers: 
+      - smari
+    participants:
+      - cmari
+      - smari
+
+settings:
+  generateGenesis: True 
+  removeConfigMapOnDelete: false
+
+addNewOrg: false
+newOrgs:
+  - name: smari
+  - name: cmari
