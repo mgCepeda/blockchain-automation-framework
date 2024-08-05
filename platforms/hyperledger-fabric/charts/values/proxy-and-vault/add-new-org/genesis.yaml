@@ -1,6 +1,6 @@
 #helm install ca-certs -f values/proxy-and-vault/genesis.yaml -n supplychain-net fabric-genesis
 global:
-  version: 2.5.4
+  version: 2.2.2
   serviceAccountName: vault-auth
   cluster:
     provider: aws

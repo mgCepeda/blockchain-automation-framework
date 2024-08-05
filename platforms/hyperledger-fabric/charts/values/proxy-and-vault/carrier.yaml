@@ -1,6 +1,6 @@
 #helm install pee0-carrier -f values/noproxy-and-novault/peer.yaml -n carrier-net fabric-peer
 global:
-  version: 2.5.4
+  version: 2.2.2
   serviceAccountName: vault-auth
   cluster:
     provider: aws

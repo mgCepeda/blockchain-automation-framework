@@ -1,6 +1,6 @@
 #helm install pee0-warehouse -f values/noproxy-and-novault/peer.yaml -n warehouse-net fabric-peer
 global:
-  version: 2.5.4
+  version: 2.2.2
   serviceAccountName: vault-auth
   cluster:
     provider: aws

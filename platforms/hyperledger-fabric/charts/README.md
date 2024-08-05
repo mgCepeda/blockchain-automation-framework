@@ -232,7 +232,7 @@ kubectl --namespace supplychain-net get configmap allchannel-supplychain-anchort
 # Install join channel and anchorpeer
 cd ../..
 helm install peer0-allchannel ./fabric-channel-join --namespace supplychain-net --values ./values/proxy-and-vault/join-channel.yaml
-helm install peer1-allchannel ./fabric-channel-join --namespace supplychain-net --values ./values/proxy-and-vault/join-channel.yaml --set peer.name=peer1 --set peer.address=peer1.supplychain-net.test.yourdomain.com:443 --set peer.type=general
+helm install peer1-allchannel ./fabric-channel-join --namespace supplychain-net --values ./values/proxy-and-vault/join-channel.yaml --set peer.name=peer1 --set peer.address=peer1.supplychain-net.hlf.blockchaincloudpoc-develop.com:443 --set peer.type=general
 
 # Join peer from another organization to channel and make it an anchorpeer
 cd ./fabric-channel-join/files
@@ -261,6 +261,9 @@ helm uninstall --namespace warehouse-net warehouse-ca
 
 ```
 
+
+```bash
+
 kubectl create namespace warehouse-net 
 kubectl -n warehouse-net create secret generic roottoken --from-literal=token=<VAULT_ROOT_TOKEN>
 # Install the CA Server
@@ -280,7 +283,7 @@ helm upgrade --install peer0 ./fabric-peernode --namespace warehouse-net --value
 ```bash
 # Obtain certificates and the configuration file of each peer organization, place in fabric-genesis/files
 
-helm uninstall --namespace supplychain-net genesis
+helm uninstall --namespace supplychain-net genesis #For recreate newconfigtx
 
 cd ./fabric-genesis/files
 kubectl --namespace carrier-net get secret admin-msp -o json > carrier.json
@@ -298,8 +301,14 @@ kubectl --namespace carrier-net get secret admin-msp -o json > carrier.json
 
 helm install update-block ./fabric-update-block --namespace supplychain-net --values ./values/proxy-and-vault/add-new-org/update.yaml
 
+Join channel version 2.5.4
 helm install peer0-allchannel ./fabric-channel-join --namespace warehouse-net --values ./values/proxy-and-vault/add-new-org/create-channel.yaml --set global.version=2.5.4
 
+Join channel version 2.2.2
+cd ./fabric-channel-join/files
+kubectl --namespace supplychain-net get configmap allchannel-warehouse-anchortx -o jsonpath='{.data.allchannel-warehouse-anchortx_base64}' > anchortx.json
+cd ../..
+helm install peer0-allchannel ./fabric-channel-join --namespace warehouse-net --values ./values/proxy-and-vault/add-new-org/create-channel.yaml
 
 helm uninstall --namespace supplychain-net update-block
 

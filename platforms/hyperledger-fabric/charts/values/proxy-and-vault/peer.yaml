@@ -1,6 +1,6 @@
 #helm install pee0 -f values/proxy-and-vault/orderer.yaml -n carrier-net fabric-orderernode
 global:
-  version: 2.5.4
+  version: 2.2.2
   serviceAccountName: vault-auth
   cluster:
     provider: aws
