@@ -94,7 +94,7 @@ settings:
   removeConfigMapOnDelete: false
 
 {% if add_org %}
-add_new_org: {{ add_org }}
+addNewOrg: {{ add_org }}
 newOrgs:
 {% for organization in network.organizations %}
 {% for data, value in organization.items() %}

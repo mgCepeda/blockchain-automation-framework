@@ -3,7 +3,7 @@ global:
   version: 2.5.4
   serviceAccountName: vault-auth
   cluster:
-    provider: azure
+    provider: aws
     cloudNativeServices: false
   vault:
     type: kubernetes

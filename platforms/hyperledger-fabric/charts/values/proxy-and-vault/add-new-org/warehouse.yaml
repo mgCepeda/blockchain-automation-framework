@@ -1,4 +1,4 @@
-#helm install pee0 -f values/proxy-and-vault/orderer.yaml -n carrier-net fabric-orderernode
+#helm install pee0-warehouse -f values/noproxy-and-novault/peer.yaml -n warehouse-net fabric-peer
 global:
   version: 2.5.4
   serviceAccountName: vault-auth
@@ -9,9 +9,9 @@ global:
     type: hashicorp
     role: vault-role
     address: http://vault.internal.dev.aws.blockchaincloudpoc-develop.com:20002
-    authPath: supplychain
+    authPath: warehouse
     secretEngine: secretsv2
-    secretPrefix: "data/supplychain"
+    secretPrefix: "data/warehouse"
     tls: false
   proxy:
     provider: haproxy
@@ -20,12 +20,12 @@ global:
 certs:
   generateCertificates: true
   orgData:
-    caAddress: ca.supplychain-net:7054
-    caAdminUser: supplychain-admin
-    caAdminPassword: supplychain-adminpw
-    orgName: supplychain
+    caAddress: ca.warehouse-net.hlf.blockchaincloudpoc-develop.com
+    caAdminUser: warehouse-admin
+    caAdminPassword: warehouse-adminpw
+    orgName: warehouse
     type: peer
-    componentSubject: "O=Orderer,L=51.50/-0.13/London,C=GB"
+    componentSubject: "O=Warehouse,OU=Warehouse,L=42.36/-71.06/Boston,C=US"
   users: 
     usersList:
       - user:
@@ -35,21 +35,22 @@ certs:
           value: "true"
   settings:
     #Flag to create configmaps for the organization. This flag must be set to true when installing the first orderer/peer in organization and false for others.
-    createConfigMaps: false
+    createConfigMaps: true
     refreshCertValue: false
     addPeerValue: false
     removeCertsOnDelete: true
     removeOrdererTlsOnDelete: true
-
+storage:
+  enabled: false
 peer:
-  gossipPeerAddress: peer1.supplychain-net.hlf.blockchaincloudpoc-develop.com:443
+  gossipPeerAddress: 
   logLevel: info
-  localMspId: supplychainMSP
+  localMspId: warehouseMSP
   tlsStatus: true
-  cliEnabled: false
+  cliEnabled: true
   ordererAddress: orderer1.supplychain-net.hlf.blockchaincloudpoc-develop.com:443
   builder: hyperledger/fabric-ccenv
   couchdb:
-    username: supplychain-user
-    password: supplychain-userpw
+    username: warehouse-user
+    password: warehouse-userpw
   upgrade: false

@@ -320,7 +320,7 @@ spec:
                   {{- end }}
                 fi
               {{- end }}
-              {{- if .Values.add_new_org }}
+              {{- if .Values.addNewOrg }}
                 {{- range $org := $.Values.newOrgs }}
                   export FABRIC_CFG_PATH=/templates
                   configtxgen -printOrg {{ $org.name | lower }}MSP > {{ $org.name | lower }}_new.json

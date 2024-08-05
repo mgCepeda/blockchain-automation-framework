@@ -6,7 +6,7 @@ global:
     type: kubernetes
 
   cluster:
-    provider: z
+    provider: aws
     cloudNativeServices: false
   
   proxy:

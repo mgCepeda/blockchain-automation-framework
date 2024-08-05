@@ -1,4 +1,4 @@
-#helm install carrier-ca -f values/proxy-and-vault/ca-server.yaml -n carrier-net fabric-ca-server
+#helm install warehouse-ca -f values/proxy-and-vault/ca-server.yaml -n warehouse-net fabric-ca-server
 global:
   serviceAccountName: vault-auth
   cluster:
@@ -9,9 +9,9 @@ global:
     type: hashicorp
     role: vault-role
     address: http://vault.internal.dev.aws.blockchaincloudpoc-develop.com:20002
-    authPath: carrier
+    authPath: warehouse
     secretEngine: secretsv2
-    secretPrefix: "data/carrier"
+    secretPrefix: "data/warehouse"
     tls: false
   proxy:
     provider: haproxy
@@ -22,6 +22,6 @@ storage:
 server:
   removeCertsOnDelete: true
   tlsStatus: true
-  adminUsername: carrier-admin
-  adminPassword: carrier-adminpw
-  subject: /C=GB/ST=London/L=London/O=Carrier
+  adminUsername: warehouse-admin
+  adminPassword: warehouse-adminpw
+  subject: /C=US/ST=Massachusetts/L=Boston/O=Warehouse

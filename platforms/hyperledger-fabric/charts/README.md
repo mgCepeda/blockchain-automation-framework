@@ -153,7 +153,7 @@ kubectl -n supplychain-net create secret generic roottoken --from-literal=token=
 helm upgrade --install supplychain-ca ./fabric-ca-server --namespace supplychain-net --values ./values/proxy-and-vault/ca-orderer.yaml
 
 # Install the Orderers after CA server is running
-helm upgrade --install orderer1 ./fabric-orderernode --namespace supplychain-net --values ./values/proxy-and-vault/orderer.yaml
+helm upgrade --install orderer1 ./fabric-orderernode --namespace supplychain-net --values ./values/proxy-and-vault/orderer.yaml 
 helm upgrade --install orderer2 ./fabric-orderernode --namespace supplychain-net --values ./values/proxy-and-vault/orderer.yaml --set certs.settings.createConfigMaps=false
 helm upgrade --install orderer3 ./fabric-orderernode --namespace supplychain-net --values ./values/proxy-and-vault/orderer.yaml --set certs.settings.createConfigMaps=false
 ```
@@ -207,7 +207,7 @@ helm install allchannel ./fabric-osnadmin-channel-create --namespace supplychain
 
 # Join peer to channel and make it an anchorpeer
 helm install peer0-allchannel ./fabric-channel-join --namespace supplychain-net --values ./values/proxy-and-vault/join-channel.yaml
-helm install peer1-allchannel ./fabric-channel-join --namespace supplychain-net --values ./values/proxy-and-vault/join-channel.yaml --set peer.name=peer1 --set peer.address=peer1.supplychain-net.test.yourdomain.com:443
+helm install peer1-allchannel ./fabric-channel-join --namespace supplychain-net --values ./values/proxy-and-vault/join-channel.yaml --set peer.name=peer1 --set peer.address=peer1.supplychain-net.hlf.blockchaincloudpoc-develop.com:443
 
 # Join peer from another organization to channel and make it an anchorpeer
 helm install peer0-allchannel ./fabric-channel-join --namespace carrier-net --values ./values/proxy-and-vault/create-channel.yaml --set global.version=2.5.4
@@ -254,4 +254,52 @@ helm uninstall --namespace supplychain-net supplychain-ca
 
 helm uninstall --namespace carrier-net peer0 peer0-allchannel allchannel
 helm uninstall --namespace carrier-net carrier-ca
+helm uninstall --namespace carrier-net update-block
+
+helm uninstall --namespace warehouse-net peer0 peer0-allchannel allchannel
+helm uninstall --namespace warehouse-net warehouse-ca
+
 ```
+
+kubectl create namespace warehouse-net 
+kubectl -n warehouse-net create secret generic roottoken --from-literal=token=<VAULT_ROOT_TOKEN>
+# Install the CA Server
+helm upgrade --install warehouse-ca ./fabric-ca-server --namespace warehouse-net --values ./values/proxy-and-vault/add-new-org/ca-peer.yaml
+
+# Get the Orderer tls certificate and place in fabric-peernode/files
+cd ./fabric-peernode/files
+kubectl --namespace supplychain-net get configmap orderer-tls-cacert -o jsonpath='{.data.cacert}' > orderer.crt
+
+# Install the Peers
+cd ../..
+helm upgrade --install peer0 ./fabric-peernode --namespace warehouse-net --values ./values/proxy-and-vault/add-new-org/warehouse.yaml
+
+
+#### Create Genesis file and other channel artifacts
+
+```bash
+# Obtain certificates and the configuration file of each peer organization, place in fabric-genesis/files
+
+helm uninstall --namespace supplychain-net genesis
+
+cd ./fabric-genesis/files
+kubectl --namespace carrier-net get secret admin-msp -o json > carrier.json
+kubectl --namespace carrier-net get configmap peer0-msp-config -o json > carrier-config-file.json
+
+kubectl --namespace warehouse-net get secret admin-msp -o json > warehouse.json
+kubectl --namespace warehouse-net get configmap peer0-msp-config -o json > warehouse-config-file.json
+
+# Generate the genesis block
+cd ../..
+helm  install genesis ./fabric-genesis --namespace supplychain-net --values ./values/proxy-and-vault/add-new-org/genesis.yaml 
+
+kubectl --namespace supplychain-net get configmap warehouse-new-data -o jsonpath='{.data.warehouse-new-data}' > warehouse-new-data.json
+kubectl --namespace carrier-net get secret admin-msp -o json > carrier.json
+
+helm install update-block ./fabric-update-block --namespace supplychain-net --values ./values/proxy-and-vault/add-new-org/update.yaml
+
+helm install peer0-allchannel ./fabric-channel-join --namespace warehouse-net --values ./values/proxy-and-vault/add-new-org/create-channel.yaml --set global.version=2.5.4
+
+
+helm uninstall --namespace supplychain-net update-block
+
